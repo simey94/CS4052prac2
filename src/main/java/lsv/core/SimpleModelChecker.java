@@ -6,7 +6,14 @@ import lsv.grammar.Formula;
 public class SimpleModelChecker implements ModelChecker {
 
     public boolean check(Model model, Formula constraint, Formula formula) {
-	// TO IMPLEMENT
+
+
+        // if constraint evaluates to false, don't consider this path
+
+        // analyse formula - what does it mean?
+
+
+
 	return false;
     }
 

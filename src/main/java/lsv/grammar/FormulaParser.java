@@ -8,7 +8,7 @@ import java.util.ArrayList;
 *This is an Antlr grammar used to generate the parser and lexer
 */
 @SuppressWarnings("all")
-public class FormulaParser extends Parser {
+public class  FormulaParser extends Parser {
 	public static final String[] tokenNames = new String[] {
 		"<invalid>", "<EOR>", "<DOWN>", "<UP>", "ALL", "ATOMIC", "CLOSE", "EXISTS", 
 		"FALSE", "OPEN", "TEMPORAL", "TRUE", "UNTIL", "WS", "'!'", "'&&'", "'<=>'", 
