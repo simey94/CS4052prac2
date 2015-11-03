@@ -27,6 +27,7 @@ public class FormulaTest {
 	assertEquals("AF", formula.getQuantifier());
 
     }
+	// if ap[0] formula.getOperator ap[1] == true, check actions align with quantifier
 
     @Test
     public void parseCtl2() {
@@ -64,7 +65,8 @@ public class FormulaTest {
 	assertNull(formula.getAp()[1]);
 
 	assertEquals(2, formula.getNestedCTL().length);
-	assertNull(formula.getNestedCTL()[0]);
+
+    assertNull(formula.getNestedCTL()[0]);
 	
 	Formula nested1 = formula.getNestedCTL()[1];
 
