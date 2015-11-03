@@ -28,39 +28,135 @@ public class SimpleModelChecker implements ModelChecker {
 
 
 
-private boolean testForm(Formula f) {
-    switch(f.getOperator()) {
-
-        case ("||"):
-            break;
-        case ("&&"):
-            break;
-        case ("!"):
-            break;
-        case ("=>"):
-            break;
-        case ("<=>"):
-            break;
-        default:
-            break;
-    }
-
-    return  false;
-}
+//private boolean testForm(Formula f) {
+//    switch(f.getOperator()) {
+//
+//        case ("||"):
+//            break;
+//        case ("&&"):
+//            break;
+//        case ("!"):
+//            break;
+//        case ("=>"):
+//            break;
+//        case ("<=>"):
+//            break;
+//        default:
+//            break;
+//    }
+//
+//    return  false;
+//}
 
     /**
      * test sub parts of formula
      * @param f
      * @return
      */
-    private boolean testSubForm(Formula f) {
+    private boolean testSubForm(Formula f, Model m) {
 
+        Object[] vals = new Object[2];
+        boolean[] valid = new boolean[2];
         if (f.getAp()[0] != null) {
-
-
-        } else if (f.getAp()[1] != null) {
-
+            vals[0] = f.getAp()[0];
         }
+
+        else if (f.getTautology()[0] !=null) {
+            vals[0] = f.getTautology()[0];
+        }
+        else if (f.getNestedCTL()[0] !=null) {
+            vals[0] = f.getNestedCTL()[0];
+        }
+        else if (f.getActions()[0] != null) {
+            vals[0] = f.getActions()[0];
+        }
+
+        if (f.getAp()[1] != null) {
+            vals[1] = f.getAp()[1];
+        }
+
+        else if (f.getTautology()[1] !=null) {
+            vals[1] = f.getTautology()[1];
+        }
+        else if (f.getNestedCTL()[1] !=null) {
+            vals[1] = f.getNestedCTL()[1];
+        }
+        else if (f.getActions()[1] != null) {
+            vals[1] = f.getActions()[1];
+        }
+
+
+        for (int i =0; i<vals.length; i++) {
+            if  (vals[i] == null) {
+                valid[i] = true;
+            }
+            if (vals[i] instanceof Formula) {
+                valid[i] = testSubForm((Formula) vals[i],m);
+            }
+            else {
+               valid[i] = evaluate(f.getQuantifier(),(String) vals[i], m);
+            }
+        }
+        //TODO deal
+
+        switch(f.getOperator()) {
+
+            case ("||"):
+                return (valid[0] || valid[1]);
+            case ("&&"):
+                return (valid[0] && valid[1]);
+            case ("!"):
+                return !(valid[0] && valid[1]);
+            case ("=>"):
+                return (!valid[0] || valid[1]);
+            case ("<=>"):
+                break;
+            default:
+                break;
+        }
+
+        return false;
+    }
+
+
+    private boolean evaluate(String quantifier, String toEval, Model model) {
+        switch (quantifier){
+//            Always Globally
+            case ("AG"):
+                break;
+//            always finally
+            case ("AF"):
+//            always
+            case ("A"):
+                break;
+//            finally globally
+            case ("FG"):
+                break;
+//            finally
+            case ("F"):
+                break;
+//            Eventually finally
+            case ("EF"):
+                break;
+//            Eventually globally
+            case ("EG"):
+                break;
+//            Next
+            case ("X"):
+                break;
+
+//            Until
+            case ("U"):
+                break;
+//            Weak Until
+            case ("W"):
+                break;
+            default:
+                break;
+        }
+
+
+
         return false;
     }
 }
