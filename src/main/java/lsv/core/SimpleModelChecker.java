@@ -21,4 +21,46 @@ public class SimpleModelChecker implements ModelChecker {
 	// TO IMPLEMENT
 	return null;
     }
+
+
+
+
+
+
+
+private boolean testForm(Formula f) {
+    switch(f.getOperator()) {
+
+        case ("||"):
+            break;
+        case ("&&"):
+            break;
+        case ("!"):
+            break;
+        case ("=>"):
+            break;
+        case ("<=>"):
+            break;
+        default:
+            break;
+    }
+
+    return  false;
+}
+
+    /**
+     * test sub parts of formula
+     * @param f
+     * @return
+     */
+    private boolean testSubForm(Formula f) {
+
+        if (f.getAp()[0] != null) {
+
+
+        } else if (f.getAp()[1] != null) {
+
+        }
+        return false;
+    }
 }
