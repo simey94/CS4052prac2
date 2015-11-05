@@ -23,11 +23,6 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-
-
-
-
-
 //private boolean testForm(Formula f) {
 //    switch(f.getOperator()) {
 //

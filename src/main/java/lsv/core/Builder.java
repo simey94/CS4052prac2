@@ -27,7 +27,8 @@ import org.antlr.runtime.RecognitionException;
 /**
  * Builder contains static methods for building models and formulas from files and other
  * chunks of json.  Shouldn't need to deal with json or file access anywhere else.
- * */
+ *
+ **/
 public class Builder {
 
     public static Model buildModel(String filePath) {
