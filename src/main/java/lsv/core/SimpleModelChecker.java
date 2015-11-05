@@ -1,9 +1,12 @@
 package lsv.core;
 
-import lsv.model.Model;
 import lsv.grammar.Formula;
+import lsv.model.Model;
 import lsv.model.State;
 import lsv.model.Transition;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class SimpleModelChecker implements ModelChecker {
 
@@ -116,24 +119,33 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-        private void traverseModel(Model model) {
+    private boolean traverseModel(Model model) {
+        ArrayList<Transition> transitions = (ArrayList<Transition>) Arrays.asList(model.getTransitions());
             for (State state : model.getStates()) {
                 if (state.isInit()) {
-                    for (Transition t : model.getTransitions()) {
-                        if (t.getSource() == state.getName()) {
-                            String next = t.getTarget();
-                            for (Transition n : model.getTransitions()) {
-                                if (n.getSource() == next) {
-
-                                }
-
-                            }
-                        }
-                    }
+                    if (!helper(transitions, state.getName()))
+                        return false;
                 }
+            }
+        return true;
+        }
+
+    private boolean helper(ArrayList<Transition> transitions, String stateName) {
+        if (transitions.isEmpty()) {
+            return true;
+        }
+
+        for (Transition t : transitions) {
+            if (t.getSource() == stateName) {
+                String next = t.getTarget();
+                transitions.remove(t);
+                if (!helper(transitions, next))
+                    return false;
             }
         }
 
+        return true;
+    }
 
     private boolean evaluate(String quantifier, String toEval, Model model) {
         switch (quantifier){
