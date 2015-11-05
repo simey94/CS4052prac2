@@ -2,6 +2,8 @@ package lsv.core;
 
 import lsv.model.Model;
 import lsv.grammar.Formula;
+import lsv.model.State;
+import lsv.model.Transition;
 
 public class SimpleModelChecker implements ModelChecker {
 
@@ -112,6 +114,25 @@ public class SimpleModelChecker implements ModelChecker {
 
         return false;
     }
+
+
+        private void traverseModel(Model model) {
+            for (State state : model.getStates()) {
+                if (state.isInit()) {
+                    for (Transition t : model.getTransitions()) {
+                        if (t.getSource() == state.getName()) {
+                            String next = t.getTarget();
+                            for (Transition n : model.getTransitions()) {
+                                if (n.getSource() == next) {
+
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
 
     private boolean evaluate(String quantifier, String toEval, Model model) {
