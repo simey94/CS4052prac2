@@ -119,27 +119,39 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-    private boolean traverseModel(Model model) {
+    private boolean traverseModel(Model model, Formula constraint, Formula formula) {
         ArrayList<Transition> transitions = (ArrayList<Transition>) Arrays.asList(model.getTransitions());
             for (State state : model.getStates()) {
                 if (state.isInit()) {
-                    if (!helper(transitions, state.getName()))
+                    ArrayList<String> history = new ArrayList<String>();
+                    history.add(state.getName());
+                    if (!helper(transitions, state.getName(), constraint, formula, history))
                         return false;
+//                    TODO throw history somehow
                 }
             }
         return true;
         }
 
-    private boolean helper(ArrayList<Transition> transitions, String stateName) {
+    private boolean helper(ArrayList<Transition> transitions, String stateName, Formula constraint, Formula formula, ArrayList<String> history) {
         if (transitions.isEmpty()) {
             return true;
         }
 
+
+//        if constraint is true, return false - can't use this branch
+//        if formula is false, return false - can't use this branch (Want formula
+
+//        if always, break at first error -
+        history.add(stateName);
         for (Transition t : transitions) {
             if (t.getSource() == stateName) {
+
+                history.add(t.toString());
+
                 String next = t.getTarget();
                 transitions.remove(t);
-                if (!helper(transitions, next))
+                if (!helper(transitions, next, constraint, formula, history))
                     return false;
             }
         }
