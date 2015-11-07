@@ -10,6 +10,9 @@ import java.util.Arrays;
 
 public class SimpleModelChecker implements ModelChecker {
 
+
+    private ArrayList<String> globHistory;
+
     public boolean check(Model model, Formula constraint, Formula formula) {
 
 
@@ -18,13 +21,12 @@ public class SimpleModelChecker implements ModelChecker {
         // analyse formula - what does it mean?
 
 
-
 	return false;
     }
 
     public String[] getTrace() {
 	// TO IMPLEMENT
-	return null;
+        return (String[]) globHistory.toArray();
     }
 
 
@@ -127,7 +129,6 @@ public class SimpleModelChecker implements ModelChecker {
                     history.add(state.getName());
                     if (!helper(transitions, state.getName(), constraint, formula, history))
                         throw new NotValidException(history);
-//                    TODO throw history somehow
                 }
             }
         return true;

@@ -7,15 +7,21 @@ import java.util.ArrayList;
  */
 
 
+
 class NotValidException extends Exception
 {
+
+    private ArrayList<String> history;
+
     //Parameterless Constructor
     public NotValidException(ArrayList<String> history) {
         super(history.toString());
+        this.history = history;
 
     }
 
-    //Constructor that accepts a message
-
+    public ArrayList<String> getExceptionHistory() {
+        return history;
+    }
 }
 
