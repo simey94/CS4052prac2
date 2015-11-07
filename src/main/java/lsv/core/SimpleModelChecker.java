@@ -119,14 +119,14 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-    private boolean traverseModel(Model model, Formula constraint, Formula formula) {
+    private boolean traverseModel(Model model, Formula constraint, Formula formula) throws NotValidException {
         ArrayList<Transition> transitions = (ArrayList<Transition>) Arrays.asList(model.getTransitions());
             for (State state : model.getStates()) {
                 if (state.isInit()) {
                     ArrayList<String> history = new ArrayList<String>();
                     history.add(state.getName());
                     if (!helper(transitions, state.getName(), constraint, formula, history))
-                        return false;
+                        throw new NotValidException(history);
 //                    TODO throw history somehow
                 }
             }
