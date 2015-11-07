@@ -21,11 +21,11 @@ public class SimpleModelChecker implements ModelChecker {
         // analyse formula - what does it mean?
 
 
-	return false;
+        return false;
     }
 
     public String[] getTrace() {
-	// TO IMPLEMENT
+        // TO IMPLEMENT
         return (String[]) globHistory.toArray();
     }
 
@@ -52,6 +52,7 @@ public class SimpleModelChecker implements ModelChecker {
 
     /**
      * test sub parts of formula
+     *
      * @param f
      * @return
      */
@@ -61,47 +62,37 @@ public class SimpleModelChecker implements ModelChecker {
         boolean[] valid = new boolean[2];
         if (f.getAp()[0] != null) {
             vals[0] = f.getAp()[0];
-        }
-
-        else if (f.getTautology()[0] !=null) {
+        } else if (f.getTautology()[0] != null) {
             vals[0] = f.getTautology()[0];
-        }
-        else if (f.getNestedCTL()[0] !=null) {
+        } else if (f.getNestedCTL()[0] != null) {
             vals[0] = f.getNestedCTL()[0];
-        }
-        else if (f.getActions()[0] != null) {
+        } else if (f.getActions()[0] != null) {
             vals[0] = f.getActions()[0];
         }
 
         if (f.getAp()[1] != null) {
             vals[1] = f.getAp()[1];
-        }
-
-        else if (f.getTautology()[1] !=null) {
+        } else if (f.getTautology()[1] != null) {
             vals[1] = f.getTautology()[1];
-        }
-        else if (f.getNestedCTL()[1] !=null) {
+        } else if (f.getNestedCTL()[1] != null) {
             vals[1] = f.getNestedCTL()[1];
-        }
-        else if (f.getActions()[1] != null) {
+        } else if (f.getActions()[1] != null) {
             vals[1] = f.getActions()[1];
         }
 
 
-        for (int i =0; i<vals.length; i++) {
-            if  (vals[i] == null) {
+        for (int i = 0; i < vals.length; i++) {
+            if (vals[i] == null) {
                 valid[i] = true;
             }
             if (vals[i] instanceof Formula) {
-                valid[i] = testSubForm((Formula) vals[i],m);
-            }
-            else {
-               valid[i] = evaluate(f.getQuantifier(),(String) vals[i], m);
+                valid[i] = testSubForm((Formula) vals[i], m);
+            } else {
+                valid[i] = evaluate(f.getQuantifier(), (String) vals[i], m);
             }
         }
-        //TODO deal
 
-        switch(f.getOperator()) {
+        switch (f.getOperator()) {
 
             case ("||"):
                 return (valid[0] || valid[1]);
@@ -123,16 +114,16 @@ public class SimpleModelChecker implements ModelChecker {
 
     private boolean traverseModel(Model model, Formula constraint, Formula formula) throws NotValidException {
         ArrayList<Transition> transitions = (ArrayList<Transition>) Arrays.asList(model.getTransitions());
-            for (State state : model.getStates()) {
-                if (state.isInit()) {
-                    ArrayList<String> history = new ArrayList<String>();
-                    history.add(state.getName());
-                    if (!helper(transitions, state.getName(), constraint, formula, history))
-                        throw new NotValidException(history);
-                }
+        for (State state : model.getStates()) {
+            if (state.isInit()) {
+                ArrayList<String> history = new ArrayList<String>();
+                history.add(state.getName());
+                if (!helper(transitions, state.getName(), constraint, formula, history))
+                    throw new NotValidException(history);
             }
-        return true;
         }
+        return true;
+    }
 
     private boolean helper(ArrayList<Transition> transitions, String stateName, Formula constraint, Formula formula, ArrayList<String> history) {
         if (transitions.isEmpty()) {
@@ -161,7 +152,7 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
     private boolean evaluate(String quantifier, String toEval, Model model) {
-        switch (quantifier){
+        switch (quantifier) {
 //            Always Globally
             case ("AG"):
                 break;
@@ -195,7 +186,6 @@ public class SimpleModelChecker implements ModelChecker {
             default:
                 break;
         }
-
 
 
         return false;
