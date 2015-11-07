@@ -29,27 +29,6 @@ public class SimpleModelChecker implements ModelChecker {
         return (String[]) globHistory.toArray();
     }
 
-
-//private boolean testForm(Formula f) {
-//    switch(f.getOperator()) {
-//
-//        case ("||"):
-//            break;
-//        case ("&&"):
-//            break;
-//        case ("!"):
-//            break;
-//        case ("=>"):
-//            break;
-//        case ("<=>"):
-//            break;
-//        default:
-//            break;
-//    }
-//
-//    return  false;
-//}
-
     /**
      * test sub parts of formula
      *
