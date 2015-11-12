@@ -25,13 +25,11 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
     public String[] getTrace() {
-        // TO IMPLEMENT
         return (String[]) globHistory.toArray();
     }
 
     /**
      * test sub parts of formula
-     *
      * @param f
      * @return
      */
@@ -91,28 +89,36 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-    private boolean traverseModel(Model model, Formula constraint, Formula formula) throws NotValidException {
+    private boolean traverseModel(Model model, Formula constraint, Formula formula, boolean cont) throws NotValidException {
+        boolean trueAtSomePoint = false;
         ArrayList<Transition> transitions = (ArrayList<Transition>) Arrays.asList(model.getTransitions());
+
         for (State state : model.getStates()) {
             if (state.isInit()) {
                 ArrayList<String> history = new ArrayList<String>();
                 history.add(state.getName());
-                if (!helper(transitions, state.getName(), constraint, formula, history))
-                    throw new NotValidException(history);
+                if (!helper(transitions, state.getName(), constraint, formula, history, cont)) {
+                    if (!cont) {
+                        throw new NotValidException(history);
+                    } else {
+                        continue;
+                    }
+                } else {
+                    trueAtSomePoint = true;
+                }
             }
         }
-        return true;
+        return trueAtSomePoint;
     }
 
-    private boolean helper(ArrayList<Transition> transitions, String stateName, Formula constraint, Formula formula, ArrayList<String> history) {
+    private boolean helper(ArrayList<Transition> transitions, String stateName, Formula constraint, Formula formula, ArrayList<String> history, boolean cont) {
+
+        boolean trueAtSomePoint = false;
         if (transitions.isEmpty()) {
             return true;
         }
-
-
 //        if constraint is true, return false - can't use this branch
-//        if formula is false, return false - can't use this branch (Want formula
-
+//        if formula is false, return false - can't use this branch
 //        if always, break at first error -
         history.add(stateName);
         for (Transition t : transitions) {
@@ -122,44 +128,63 @@ public class SimpleModelChecker implements ModelChecker {
 
                 String next = t.getTarget();
                 transitions.remove(t);
-                if (!helper(transitions, next, constraint, formula, history))
-                    return false;
+                if (!helper(transitions, next, constraint, formula, history, cont)) {
+
+                    if (!cont)
+                        return false;
+                    else {
+                        continue;
+                    }
+                } else {
+                    trueAtSomePoint = true;
+                }
             }
         }
 
-        return true;
+        return trueAtSomePoint;
     }
 
     private boolean evaluate(String quantifier, String toEval, Model model) {
         switch (quantifier) {
-//            Always Globally
+//            Globally - Has to hold entire subsequent path
+            case ("G"):
+                break;
+//            Always Globally - from here on (all paths), true no matter what happens
             case ("AG"):
                 break;
-//            always finally
+//            always finally - always
             case ("AF"):
-//            always
+//            always all paths
             case ("A"):
                 break;
 //            finally globally
             case ("FG"):
                 break;
-//            finally
+//            finally -- at some point, this is true
             case ("F"):
                 break;
-//            Eventually finally
+//            Eventually finally - might be true at some point
             case ("EF"):
                 break;
 //            Eventually globally
             case ("EG"):
                 break;
-//            Next
+//            Next - next this happens
             case ("X"):
                 break;
 
-//            Until
+//            always the next branch holds
+            case ("AX"):
+                break;
+
+//            sometimes the next branch holds
+            case ("EX"):
+                break;
+
+//            Until - x holds until q holds
             case ("U"):
                 break;
-//            Weak Until
+//            Weak Until - x holds until y holds or  G x
             case ("W"):
                 break;
             default:
