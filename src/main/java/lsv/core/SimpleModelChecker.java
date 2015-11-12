@@ -89,7 +89,17 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-    private boolean traverseModel(Model model, Formula constraint, Formula formula, boolean cont) throws NotValidException {
+    /**
+     *
+     * @param model
+     * @param constraint
+     * @param formula
+     * @param pathQuantifier
+     * @param cont - True if global quantifier is E, False if global quantifier is A
+     * @return
+     * @throws NotValidException
+     */
+    private boolean traverseModel(Model model, Formula constraint, Formula formula, String pathQuantifier,  boolean cont) throws NotValidException, QuantifierNotFoundException {
         boolean trueAtSomePoint = false;
         ArrayList<Transition> transitions = (ArrayList<Transition>) Arrays.asList(model.getTransitions());
 
@@ -97,7 +107,7 @@ public class SimpleModelChecker implements ModelChecker {
             if (state.isInit()) {
                 ArrayList<String> history = new ArrayList<String>();
                 history.add(state.getName());
-                if (!helper(transitions, state.getName(), constraint, formula, history, cont)) {
+                if (!helper(transitions, state.getName(), constraint, formula, history,pathQuantifier, cont)) {
                     if (!cont) {
                         throw new NotValidException(history);
                     } else {
@@ -111,7 +121,7 @@ public class SimpleModelChecker implements ModelChecker {
         return trueAtSomePoint;
     }
 
-    private boolean helper(ArrayList<Transition> transitions, String stateName, Formula constraint, Formula formula, ArrayList<String> history, boolean cont) {
+    private boolean helper(ArrayList<Transition> transitions, String stateName, Formula constraint, Formula formula, ArrayList<String> history,  String pathQuantifier,  boolean cont) throws QuantifierNotFoundException {
 
         boolean trueAtSomePoint = false;
         if (transitions.isEmpty()) {
@@ -128,7 +138,27 @@ public class SimpleModelChecker implements ModelChecker {
 
                 String next = t.getTarget();
                 transitions.remove(t);
-                if (!helper(transitions, next, constraint, formula, history, cont)) {
+
+//                path specific quantifier case
+                switch(pathQuantifier.toUpperCase()) {
+
+//                    TODO need to actually deal with what we want to do - so figure out what we are evaluating
+                    case ("X"):
+                        break;
+                    case ("G"):
+                        break;
+                    case ("F"):
+                        break;
+                    case ("U"):
+                        break;
+                    case ("W"):
+                        break;
+                    default:
+                        throw new QuantifierNotFoundException(pathQuantifier);
+
+                }
+
+                if (!helper(transitions, next, constraint, formula, history, pathQuantifier,  cont)) {
 
                     if (!cont)
                         return false;
@@ -145,50 +175,62 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
     private boolean evaluate(String quantifier, String toEval, Model model) {
-        switch (quantifier) {
-//            Globally - Has to hold entire subsequent path
-            case ("G"):
-                break;
-//            Always Globally - from here on (all paths), true no matter what happens
-            case ("AG"):
-                break;
-//            always finally - always
-            case ("AF"):
-//            always all paths
-            case ("A"):
-                break;
-//            finally globally
-            case ("FG"):
-                break;
-//            finally -- at some point, this is true
-            case ("F"):
-                break;
-//            Eventually finally - might be true at some point
-            case ("EF"):
-                break;
-//            Eventually globally
-            case ("EG"):
-                break;
-//            Next - next this happens
-            case ("X"):
-                break;
 
-//            always the next branch holds
-            case ("AX"):
-                break;
 
-//            sometimes the next branch holds
-            case ("EX"):
-                break;
 
 //            Until - x holds until q holds
-            case ("U"):
+//            case ("U"):
+//                break;
+////            Weak Until - x holds until y holds or  G x
+//            case ("W"):
+//                break;
+//            default:
+//                break;
+
+        switch (quantifier.charAt(0)) {
+//            Globally - Has to hold entire subsequent path
+            case ('E'):
+                switch (quantifier) {
+//            Eventually finally - might be true at some point
+                    case ("E"):
+                        break;
+
+                    case ("EF"):
+                        break;
+//            Eventually globally
+                    case ("EG"):
+                        break;
+//            Next - next this happens
+                    case ("EX"):
+                        break;
+                }
                 break;
-//            Weak Until - x holds until y holds or  G x
-            case ("W"):
+            case ('A'):
+                switch (quantifier) {
+
+
+//            always finally - always
+                    case ("AF"):
+//            always all paths
+                    case ("A"):
+                        break;
+//            Always Globally - from here on (all paths), true no matter what happens
+                    case ("AG"):
+                        break;
+//            always the next branch holds
+                    case ("AX"):
+                        break;
+                }
                 break;
-            default:
-                break;
+////            finally globally
+//            case ("FG"):
+//                break;
+////            finally -- at some point, this is true
+//            case ("F"):
+//                break;
+
+
+
         }
 
 
