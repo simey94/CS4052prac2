@@ -102,22 +102,22 @@ public class SimpleModelChecker implements ModelChecker {
      *
      * @param model
      * @param constraint
-     * @param formula
      * @param pathQuantifier
      * @param cont - True if global quantifier is E, False if global quantifier is A
      * @return
      * @throws NotValidException
      */
 
-    private boolean traverseModel(Model model, Formula constraint, Formula formula, String pathQuantifier,  boolean cont) throws NotValidException, QuantifierNotFoundException {
+    private boolean traverseModel(Model model, Formula constraint, String pathQuantifier, String [] parsedPathFormula,  boolean cont) throws NotValidException, QuantifierNotFoundException {
         boolean trueAtSomePoint = false;
         ArrayList<Transition> transitions = (ArrayList<Transition>) Arrays.asList(model.getTransitions());
+
 
         for (State state : model.getStates()) {
             if (state.isInit()) {
                 ArrayList<String> history = new ArrayList<String>();
                 history.add(state.getName());
-                if (!helper(transitions, state.getName(), constraint, formula, history,pathQuantifier, cont)) {
+                if (!helper(transitions, state.getName(), constraint, history, pathQuantifier, parsedPathFormula, cont)) {
                     if (!cont) {
                         throw new NotValidException(history);
                     } else {
@@ -182,7 +182,7 @@ public class SimpleModelChecker implements ModelChecker {
 
                 }
 
-                if (!helper(transitions, next, constraint, history, pathQuantifier,  cont)) {
+                if (!helper(transitions, next, constraint, history, pathQuantifier, parsedPathFormula,  cont)) {
 
                     if (!cont)
                         return false;
