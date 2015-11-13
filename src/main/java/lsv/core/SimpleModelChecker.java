@@ -24,6 +24,17 @@ public class SimpleModelChecker implements ModelChecker {
     public boolean check(Model model, Formula constraint, Formula formula) {
 
 
+        String[] vals = new String[0];
+        try {
+            vals = parseSubForm(formula, model, constraint);
+            evaluate(formula.getQuantifier(), constraint, vals, model);
+        } catch (NotValidException e) {
+            e.printStackTrace();
+        } catch (QuantifierNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
         // if constraint evaluates to false, don't consider this path
 
         // analyse formula - what does it mean?
@@ -36,12 +47,19 @@ public class SimpleModelChecker implements ModelChecker {
         return (String[]) globHistory.toArray();
     }
 
+
     /**
-     * test sub parts of formula
+     * Function returns string value of formula
      * @param f
+     * @param m
+     * @param constraint
      * @return
+     * @throws NotValidException
+     * @throws QuantifierNotFoundException
      */
-    private String[] testSubForm(Formula f, Model m, Formula constraint) throws NotValidException, QuantifierNotFoundException {
+
+//    TODO maybe have array for quantifiers and opperators?
+    private String[] parseSubForm(Formula f, Model m, Formula constraint) throws NotValidException, QuantifierNotFoundException {
 
         Object[] vals = new Object[2];
         boolean[] valid = new boolean[2];
@@ -65,19 +83,16 @@ public class SimpleModelChecker implements ModelChecker {
             vals[1] = f.getActions()[1];
         }
 
-        // TODO change this block
         for (int i = 0; i < vals.length; i++) {
             if (vals[i] == null) {
                 //valid[i] = true;
                 // TODO deal with this in evaluate
             }
             if (vals[i] instanceof Formula) {
-                vals[i] = testSubForm((Formula) vals[i], m, constraint);
+                vals[i] = parseSubForm((Formula) vals[i], m, constraint);
             }
         }
 
-        // TODO think about how to deal with the return here
-        evaluate(f.getQuantifier(), constraint,  (String[]) vals, m);
 
 
         // TODO move this shiz
