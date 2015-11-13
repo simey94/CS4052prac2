@@ -41,7 +41,7 @@ public class SimpleModelChecker implements ModelChecker {
      * @param f
      * @return
      */
-    private boolean testSubForm(Formula f, Model m) {
+    private String[] testSubForm(Formula f, Model m, Formula constraint) throws NotValidException, QuantifierNotFoundException {
 
         Object[] vals = new Object[2];
         boolean[] valid = new boolean[2];
@@ -65,35 +65,39 @@ public class SimpleModelChecker implements ModelChecker {
             vals[1] = f.getActions()[1];
         }
 
-
+        // TODO change this block
         for (int i = 0; i < vals.length; i++) {
             if (vals[i] == null) {
-                valid[i] = true;
+                //valid[i] = true;
+                // TODO deal with this in evaluate
             }
             if (vals[i] instanceof Formula) {
-                valid[i] = testSubForm((Formula) vals[i], m);
-            } else {
-                valid[i] = evaluate(f.getQuantifier(), (String) vals[i], m);
+                vals[i] = testSubForm((Formula) vals[i], m, constraint);
             }
         }
 
-        switch (f.getOperator()) {
+        // TODO think about how to deal with the return here
+        evaluate(f.getQuantifier(), constraint,  (String[]) vals, m);
 
-            case ("||"):
-                return (valid[0] || valid[1]);
-            case ("&&"):
-                return (valid[0] && valid[1]);
-            case ("!"):
-                return !(valid[0] && valid[1]);
-            case ("=>"):
-                return (!valid[0] || valid[1]);
-            case ("<=>"):
-                break;
-            default:
-                break;
-        }
 
-        return false;
+        // TODO move this shiz
+//        switch (f.getOperator()) {
+//
+//            case ("||"):
+//                return (valid[0] || valid[1]);
+//            case ("&&"):
+//                return (valid[0] && valid[1]);
+//            case ("!"):
+//                return !(valid[0] && valid[1]);
+//            case ("=>"):
+//                return (!valid[0] || valid[1]);
+//            case ("<=>"):
+//                break;
+//            default:
+//                break;
+//        }
+
+        return (String[]) vals;
     }
 
 
@@ -206,7 +210,7 @@ public class SimpleModelChecker implements ModelChecker {
      * @return
      */
 
-    private boolean evaluate(String quantifier, String toEval, Model model) {
+    private boolean evaluate(String quantifier, Formula constraint, String[] toEval, Model model) throws NotValidException, QuantifierNotFoundException {
 
 
 
@@ -226,7 +230,6 @@ public class SimpleModelChecker implements ModelChecker {
 //            Eventually finally - might be true at some point
                     case ("E"):
                         break;
-
                     case ("EF"):
                         break;
 //            Eventually globally
@@ -254,6 +257,10 @@ public class SimpleModelChecker implements ModelChecker {
                         break;
                 }
                 break;
+            default:
+                // TODO if its not A or E what do we do
+                traverseModel(model, constraint, quantifier, toEval, false);
+
 ////            finally globally
 //            case ("FG"):
 //                break;
