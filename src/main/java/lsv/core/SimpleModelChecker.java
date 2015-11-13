@@ -13,6 +13,14 @@ public class SimpleModelChecker implements ModelChecker {
 
     private ArrayList<String> globHistory;
 
+    /**
+     *
+     * @param model
+     * @param constraint
+     * @param formula
+     * @return
+     */
+
     public boolean check(Model model, Formula constraint, Formula formula) {
 
 
@@ -90,6 +98,7 @@ public class SimpleModelChecker implements ModelChecker {
 
 
     /**
+     * Identifies init states.
      *
      * @param model
      * @param constraint
@@ -99,6 +108,7 @@ public class SimpleModelChecker implements ModelChecker {
      * @return
      * @throws NotValidException
      */
+
     private boolean traverseModel(Model model, Formula constraint, Formula formula, String pathQuantifier,  boolean cont) throws NotValidException, QuantifierNotFoundException {
         boolean trueAtSomePoint = false;
         ArrayList<Transition> transitions = (ArrayList<Transition>) Arrays.asList(model.getTransitions());
@@ -121,7 +131,20 @@ public class SimpleModelChecker implements ModelChecker {
         return trueAtSomePoint;
     }
 
-    private boolean helper(ArrayList<Transition> transitions, String stateName, Formula constraint, Formula formula, ArrayList<String> history,  String pathQuantifier,  boolean cont) throws QuantifierNotFoundException {
+    /**
+     *
+     * @param transitions
+     * @param stateName
+     * @param constraint
+     * @param history
+     * @param pathQuantifier
+     * @param parsedPathFormula
+     * @param cont
+     * @return trueAtSomePoint
+     * @throws QuantifierNotFoundException
+     */
+
+    private boolean helper(ArrayList<Transition> transitions, String stateName, Formula constraint, ArrayList<String> history,  String pathQuantifier, String[] parsedPathFormula, boolean cont) throws QuantifierNotFoundException {
 
         boolean trueAtSomePoint = false;
         if (transitions.isEmpty()) {
@@ -144,6 +167,7 @@ public class SimpleModelChecker implements ModelChecker {
 
 //                    TODO need to actually deal with what we want to do - so figure out what we are evaluating
                     case ("X"):
+                        // next
                         break;
                     case ("G"):
                         break;
@@ -158,7 +182,7 @@ public class SimpleModelChecker implements ModelChecker {
 
                 }
 
-                if (!helper(transitions, next, constraint, formula, history, pathQuantifier,  cont)) {
+                if (!helper(transitions, next, constraint, history, pathQuantifier,  cont)) {
 
                     if (!cont)
                         return false;
@@ -173,6 +197,14 @@ public class SimpleModelChecker implements ModelChecker {
 
         return trueAtSomePoint;
     }
+
+    /**
+     *
+     * @param quantifier
+     * @param toEval
+     * @param model
+     * @return
+     */
 
     private boolean evaluate(String quantifier, String toEval, Model model) {
 
