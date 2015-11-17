@@ -84,6 +84,8 @@ public class SimpleModelChecker implements ModelChecker {
             if (state.isInit()) {
                 ArrayList<String> history = new ArrayList<String>();
                 history.add(state.getName());
+//                TODO evaluate if formula nad constraint are true at this point
+//                Maybe we want to split up model and just pass in current execution
                 if (!helper(transitions, state.getName(), constraint, formulaPrime, history, cont)) {
                     if (!cont) {
                         throw new NotValidException(history);
@@ -108,7 +110,6 @@ public class SimpleModelChecker implements ModelChecker {
      * @throws QuantifierNotFoundException
      */
 
-    //(!helper(transitions, state.getName(), constraint, formulaPrime, history, cont))
     private boolean helper(ArrayList<Transition> transitions, String stateName, FormulaPrime constraint, FormulaPrime formulaPrime, ArrayList<String> history, boolean cont) throws QuantifierNotFoundException {
 
         boolean trueAtSomePoint = false;
@@ -126,7 +127,8 @@ public class SimpleModelChecker implements ModelChecker {
 
                 String next = t.getTarget();
                 transitions.remove(t);
-
+//                TODO evaluate if formula nad constraint are true at this point
+//                Maybe we want to split up model and just pass in current execution
 //                path specific quantifier case
                 switch (formulaPrime.getQauntifier().charAt(1)) {
 
@@ -164,7 +166,7 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-    //     TODO maybe no return value, but call traverse model with
+    //     TODO DO WE NEED THIS?
     private void evaluate(Model model, FormulaPrime constraint, FormulaPrime formulaPrime) throws NotValidException, QuantifierNotFoundException {
         switch (formulaPrime.getQauntifier().charAt(0)) {
 //            Globally - Has to hold entire subsequent path
