@@ -27,7 +27,7 @@ public class SimpleModelChecker implements ModelChecker {
         String[] vals = new String[0];
         try {
             vals = parseSubForm(formula, model, constraint);
-            evaluate(formula.getQuantifier(), constraint, vals, model);
+            splitFormula(formula.getQuantifier(), vals);
         } catch (NotValidException e) {
             e.printStackTrace();
         } catch (QuantifierNotFoundException e) {
@@ -120,14 +120,13 @@ public class SimpleModelChecker implements ModelChecker {
      * Identifies init states.
      *
      * @param model
-     * @param constraint
      * @param pathQuantifier
      * @param cont - True if global quantifier is E, False if global quantifier is A
      * @return
      * @throws NotValidException
      */
 
-    private boolean traverseModel(Model model, Formula constraint, String pathQuantifier, String [] parsedPathFormula,  boolean cont) throws NotValidException, QuantifierNotFoundException {
+    private boolean traverseModel(Model model, String constraintQuantifier, String[] parsedConstraintFormula, String pathQuantifier, String[] parsedPathFormula, boolean cont) throws NotValidException, QuantifierNotFoundException {
         boolean trueAtSomePoint = false;
         ArrayList<Transition> transitions = (ArrayList<Transition>) Arrays.asList(model.getTransitions());
 
@@ -136,7 +135,7 @@ public class SimpleModelChecker implements ModelChecker {
             if (state.isInit()) {
                 ArrayList<String> history = new ArrayList<String>();
                 history.add(state.getName());
-                if (!helper(transitions, state.getName(), constraint, history, pathQuantifier, parsedPathFormula, cont)) {
+                if (!helper(transitions, state.getName(), constraintQuantifier, parsedConstraintFormula, history, pathQuantifier, parsedPathFormula, cont)) {
                     if (!cont) {
                         throw new NotValidException(history);
                     } else {
@@ -154,8 +153,7 @@ public class SimpleModelChecker implements ModelChecker {
      *
      * @param transitions
      * @param stateName
-     * @param constraint
-     * @param history
+    \     * @param history
      * @param pathQuantifier
      * @param parsedPathFormula
      * @param cont
@@ -163,7 +161,7 @@ public class SimpleModelChecker implements ModelChecker {
      * @throws QuantifierNotFoundException
      */
 
-    private boolean helper(ArrayList<Transition> transitions, String stateName, Formula constraint, ArrayList<String> history,  String pathQuantifier, String[] parsedPathFormula, boolean cont) throws QuantifierNotFoundException {
+    private boolean helper(ArrayList<Transition> transitions, String stateName, String constraintQuantifier, String[] parsedConstraintFormula, ArrayList<String> history, String pathQuantifier, String[] parsedPathFormula, boolean cont) throws QuantifierNotFoundException {
 
         boolean trueAtSomePoint = false;
         if (transitions.isEmpty()) {
@@ -201,7 +199,7 @@ public class SimpleModelChecker implements ModelChecker {
 
                 }
 
-                if (!helper(transitions, next, constraint, history, pathQuantifier, parsedPathFormula,  cont)) {
+                if (!helper(transitions, next, constraintQuantifier, parsedConstraintFormula, history, pathQuantifier, parsedPathFormula, cont)) {
 
                     if (!cont)
                         return false;
@@ -217,27 +215,8 @@ public class SimpleModelChecker implements ModelChecker {
         return trueAtSomePoint;
     }
 
-    /**
-     *
-     * @param quantifier
-     * @param toEval
-     * @param model
-     * @return
-     */
 
-    private boolean evaluate(String quantifier, Formula constraint, String[] toEval, Model model) throws NotValidException, QuantifierNotFoundException {
-
-
-
-//            Until - x holds until q holds
-//            case ("U"):
-//                break;
-////            Weak Until - x holds until y holds or  G x
-//            case ("W"):
-//                break;
-//            default:
-//                break;
-
+    private Object[] splitFormula(String quantifier, String[] toEval) {
         switch (quantifier.charAt(0)) {
 //            Globally - Has to hold entire subsequent path
             case ('E'):
@@ -273,21 +252,25 @@ public class SimpleModelChecker implements ModelChecker {
                 }
                 break;
             default:
-                // TODO if its not A or E what do we do
-                traverseModel(model, constraint, quantifier, toEval, false);
+                Object[] toRet = new Object[]{quantifier, toEval};
 
-////            finally globally
-//            case ("FG"):
-//                break;
-////            finally -- at some point, this is true
-//            case ("F"):
-//                break;
-
-
-
+                return toRet;
         }
-
-
-        return false;
+        return null; //returns null on error
     }
+
+
+//    private boolean evaluate(String quantifier, Formula constraint, String[] toEval, Model model) throws NotValidException, QuantifierNotFoundException {
+//
+//
+//
+//
+//
+//
+//
+//        }
+//
+//
+//        return false;
+//    }
 }
