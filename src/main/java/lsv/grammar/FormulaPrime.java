@@ -5,30 +5,40 @@ package lsv.grammar;
  */
 public class FormulaPrime {
 
-    private Formula parent;
-
-    private boolean negation;
-
-    private String quantifier;
-
+    private Object[] vals = new Object[2];
+    private String qauntifier;
     private String operator;
-
-
-    private Object[] ap;
-    private boolean[] apNeg;
-    private boolean singleAp;
-
-
-    private Object[] tautology;
-    private boolean singleTt;
-
-    private Formula[] nestedCTL;
     private String[][] actions;
+
 
     /**
      * Conyahstructor
      */
-    public FormulaPrime() {
+    public FormulaPrime(Formula f) {
+        //parse formula
+        qauntifier = f.getQuantifier();
+        operator = f.getOperator();
+
+        boolean[] valid = new boolean[2];
+        if (f.getAp()[0] != null) {
+            vals[0] = f.getAp()[0];
+        } else if (f.getTautology()[0] != null) {
+            vals[0] = f.getTautology()[0];
+        } else if (f.getNestedCTL()[0] != null) {
+            vals[0] = new FormulaPrime(f.getNestedCTL()[0]);
+        } else if (f.getActions()[0] != null) {
+            actions[0] = f.getActions()[0];
+        }
+
+        if (f.getAp()[1] != null) {
+            vals[1] = f.getAp()[1];
+        } else if (f.getTautology()[1] != null) {
+            vals[1] = f.getTautology()[1];
+        } else if (f.getNestedCTL()[1] != null) {
+            vals[1] = new FormulaPrime(f.getNestedCTL()[1]);
+        } else if (f.getActions()[1] != null) {
+            actions[1] = f.getActions()[1];
+        }
 
     }
 
