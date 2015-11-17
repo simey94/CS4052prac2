@@ -1,6 +1,7 @@
 package lsv.core;
 
 import lsv.grammar.Formula;
+import lsv.grammar.FormulaPrime;
 import lsv.model.Model;
 import lsv.model.State;
 import lsv.model.Transition;
@@ -23,13 +24,10 @@ public class SimpleModelChecker implements ModelChecker {
 
     public boolean check(Model model, Formula constraint, Formula formula) {
 
-
-        String[] vals;
-        String[] constraintVals;
         try {
-            vals = parseSubForm(formula, model, constraint);
-            constraintVals = parseSubForm(formula, model, constraint);
-            evaluate(formula.getQuantifier(), constraint.getQuantifier(), constraintVals, vals, model);
+            FormulaPrime formulaPrime = new FormulaPrime(formula);
+            FormulaPrime constraintPrime = new FormulaPrime(constraint);
+            evaluate(model, constraintPrime, formulaPrime);
         } catch (NotValidException e) {
             e.printStackTrace();
         } catch (QuantifierNotFoundException e) {
@@ -49,52 +47,6 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-    /**
-     * Function returns string value of formula
-     * @param f
-     * @param m
-     * @param constraint
-     * @return
-     * @throws NotValidException
-     * @throws QuantifierNotFoundException
-     */
-
-//    TODO maybe have array for quantifiers and opperators?
-    private String[] parseSubForm(Formula f, Model m, Formula constraint) throws NotValidException, QuantifierNotFoundException {
-
-        Object[] vals = new Object[2];
-        boolean[] valid = new boolean[2];
-        if (f.getAp()[0] != null) {
-            vals[0] = f.getAp()[0];
-        } else if (f.getTautology()[0] != null) {
-            vals[0] = f.getTautology()[0];
-        } else if (f.getNestedCTL()[0] != null) {
-            vals[0] = f.getNestedCTL()[0];
-        } else if (f.getActions()[0] != null) {
-            vals[0] = f.getActions()[0];
-        }
-
-        if (f.getAp()[1] != null) {
-            vals[1] = f.getAp()[1];
-        } else if (f.getTautology()[1] != null) {
-            vals[1] = f.getTautology()[1];
-        } else if (f.getNestedCTL()[1] != null) {
-            vals[1] = f.getNestedCTL()[1];
-        } else if (f.getActions()[1] != null) {
-            vals[1] = f.getActions()[1];
-        }
-
-        for (int i = 0; i < vals.length; i++) {
-            if (vals[i] == null) {
-                //valid[i] = true;
-                // TODO deal with this in evaluate
-            }
-            if (vals[i] instanceof Formula) {
-                vals[i] = parseSubForm((Formula) vals[i], m, constraint);
-            }
-        }
-
-
         // TODO move this shiz
 //        switch (f.getOperator()) {
 //
@@ -112,21 +64,18 @@ public class SimpleModelChecker implements ModelChecker {
 //                break;
 //        }
 
-        return (String[]) vals;
-    }
 
 
     /**
      * Identifies init states.
      *
      * @param model
-     * @param pathQuantifier
      * @param cont - True if global quantifier is E, False if global quantifier is A
      * @return
      * @throws NotValidException
      */
 
-    private boolean traverseModel(Model model, String constraintQuantifier, String[] parsedConstraintFormula, String pathQuantifier, String[] parsedPathFormula, boolean cont) throws NotValidException, QuantifierNotFoundException {
+    private boolean traverseModel(Model model, FormulaPrime formulaPrime, FormulaPrime constraint, boolean cont) throws NotValidException, QuantifierNotFoundException {
         boolean trueAtSomePoint = false;
         ArrayList<Transition> transitions = (ArrayList<Transition>) Arrays.asList(model.getTransitions());
 
@@ -135,7 +84,7 @@ public class SimpleModelChecker implements ModelChecker {
             if (state.isInit()) {
                 ArrayList<String> history = new ArrayList<String>();
                 history.add(state.getName());
-                if (!helper(transitions, state.getName(), constraintQuantifier, parsedConstraintFormula, history, pathQuantifier, parsedPathFormula, cont)) {
+                if (!helper(transitions, state.getName(), constraint, formulaPrime, history, cont)) {
                     if (!cont) {
                         throw new NotValidException(history);
                     } else {
@@ -153,15 +102,14 @@ public class SimpleModelChecker implements ModelChecker {
      *
      * @param transitions
      * @param stateName
-    \     * @param history
-     * @param pathQuantifier
-     * @param parsedPathFormula
+     * @param history
      * @param cont
      * @return trueAtSomePoint
      * @throws QuantifierNotFoundException
      */
 
-    private boolean helper(ArrayList<Transition> transitions, String stateName, String constraintQuantifier, String[] parsedConstraintFormula, ArrayList<String> history, String pathQuantifier, String[] parsedPathFormula, boolean cont) throws QuantifierNotFoundException {
+    //(!helper(transitions, state.getName(), constraint, formulaPrime, history, cont))
+    private boolean helper(ArrayList<Transition> transitions, String stateName, FormulaPrime constraint, FormulaPrime formulaPrime, ArrayList<String> history, boolean cont) throws QuantifierNotFoundException {
 
         boolean trueAtSomePoint = false;
         if (transitions.isEmpty()) {
@@ -180,26 +128,26 @@ public class SimpleModelChecker implements ModelChecker {
                 transitions.remove(t);
 
 //                path specific quantifier case
-                switch(pathQuantifier.toUpperCase()) {
+                switch (formulaPrime.getQauntifier().charAt(1)) {
 
 //                    TODO need to actually deal with what we want to do - so figure out what we are evaluating
-                    case ("X"):
+                    case ('X'):
                         // next
                         break;
-                    case ("G"):
+                    case ('G'):
                         break;
-                    case ("F"):
+                    case ('F'):
                         break;
-                    case ("U"):
+                    case ('U'):
                         break;
-                    case ("W"):
+                    case ('W'):
                         break;
                     default:
-                        throw new QuantifierNotFoundException(pathQuantifier);
+                        throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
 
                 }
 
-                if (!helper(transitions, next, constraintQuantifier, parsedConstraintFormula, history, pathQuantifier, parsedPathFormula, cont)) {
+                if (!helper(transitions, next, constraint, formulaPrime, history, cont)) {
 
                     if (!cont)
                         return false;
@@ -216,12 +164,12 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-    //     TODO maybe no return value, but call traverse model
-    private void evaluate(String quantifier, String constraintQuantifier, String[] constraintPath, String[] toEval, Model model) throws NotValidException, QuantifierNotFoundException {
-        switch (quantifier.charAt(0)) {
+    //     TODO maybe no return value, but call traverse model with
+    private void evaluate(Model model, FormulaPrime constraint, FormulaPrime formulaPrime) throws NotValidException, QuantifierNotFoundException {
+        switch (formulaPrime.getQauntifier().charAt(0)) {
 //            Globally - Has to hold entire subsequent path
             case ('E'):
-                switch (quantifier) {
+                switch (formulaPrime.getQauntifier()) {
 //            Eventually finally - might be true at some point
                     case ("E"):
                         // traverseModel()
@@ -237,8 +185,7 @@ public class SimpleModelChecker implements ModelChecker {
                 }
                 break;
             case ('A'):
-                switch (quantifier) {
-
+                switch (formulaPrime.getQauntifier()) {
 //            always finally - always
                     case ("AF"):
 //            always all paths
@@ -253,7 +200,7 @@ public class SimpleModelChecker implements ModelChecker {
                 }
                 break;
             default:
-                throw new QuantifierNotFoundException(quantifier);
+                throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
         }
     }
 

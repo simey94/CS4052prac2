@@ -23,7 +23,7 @@ public class FormulaPrime {
         if (f.getAp()[0] != null) {
             vals[0] = f.getAp()[0];
         } else if (f.getTautology()[0] != null) {
-            vals[0] = f.getTautology()[0];
+            vals[0] = true;
         } else if (f.getNestedCTL()[0] != null) {
             vals[0] = new FormulaPrime(f.getNestedCTL()[0]);
         } else if (f.getActions()[0] != null) {
@@ -33,7 +33,7 @@ public class FormulaPrime {
         if (f.getAp()[1] != null) {
             vals[1] = f.getAp()[1];
         } else if (f.getTautology()[1] != null) {
-            vals[1] = f.getTautology()[1];
+            vals[1] = true;
         } else if (f.getNestedCTL()[1] != null) {
             vals[1] = new FormulaPrime(f.getNestedCTL()[1]);
         } else if (f.getActions()[1] != null) {
@@ -42,4 +42,11 @@ public class FormulaPrime {
 
     }
 
+    public String getOperator() {
+        return operator;
+    }
+
+    public String getQauntifier() {
+        return qauntifier;
+    }
 }
