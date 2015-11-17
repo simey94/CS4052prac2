@@ -24,10 +24,12 @@ public class SimpleModelChecker implements ModelChecker {
     public boolean check(Model model, Formula constraint, Formula formula) {
 
 
-        String[] vals = new String[0];
+        String[] vals;
+        String[] constraintVals;
         try {
             vals = parseSubForm(formula, model, constraint);
-            splitFormula(formula.getQuantifier(), vals);
+            constraintVals = parseSubForm(formula, model, constraint);
+            evaluate(formula.getQuantifier(), constraint.getQuantifier(), constraintVals, vals, model);
         } catch (NotValidException e) {
             e.printStackTrace();
         } catch (QuantifierNotFoundException e) {
@@ -216,7 +218,8 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-    private Object[] splitFormula(String quantifier, String[] toEval) {
+    //     TODO maybe no return value, but call traverse model
+    private void evaluate(String quantifier, String constraintQuantifier, String[] constraintPath, String[] toEval, Model model) throws NotValidException, QuantifierNotFoundException {
         switch (quantifier.charAt(0)) {
 //            Globally - Has to hold entire subsequent path
             case ('E'):
@@ -252,25 +255,11 @@ public class SimpleModelChecker implements ModelChecker {
                 }
                 break;
             default:
-                Object[] toRet = new Object[]{quantifier, toEval};
-
-                return toRet;
+                throw new QuantifierNotFoundException(quantifier);
         }
-        return null; //returns null on error
     }
 
-
-//    private boolean evaluate(String quantifier, Formula constraint, String[] toEval, Model model) throws NotValidException, QuantifierNotFoundException {
-//
-//
-//
-//
-//
-//
-//
-//        }
-//
-//
-//        return false;
-//    }
 }
+
+
+
