@@ -36,7 +36,6 @@ public class SimpleModelChecker implements ModelChecker {
             e.printStackTrace();
         }
 
-
         // if constraint evaluates to false, don't consider this path
 
         // analyse formula - what does it mean?
@@ -94,7 +93,6 @@ public class SimpleModelChecker implements ModelChecker {
                 vals[i] = parseSubForm((Formula) vals[i], m, constraint);
             }
         }
-
 
 
         // TODO move this shiz
@@ -226,6 +224,7 @@ public class SimpleModelChecker implements ModelChecker {
                 switch (quantifier) {
 //            Eventually finally - might be true at some point
                     case ("E"):
+                        // traverseModel()
                         break;
                     case ("EF"):
                         break;
@@ -239,7 +238,6 @@ public class SimpleModelChecker implements ModelChecker {
                 break;
             case ('A'):
                 switch (quantifier) {
-
 
 //            always finally - always
                     case ("AF"):
