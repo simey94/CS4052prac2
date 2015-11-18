@@ -112,6 +112,25 @@ public class SimpleModelChecker implements ModelChecker {
 
     private boolean helper(ArrayList<Transition> transitions, String stateName, FormulaPrime constraint, FormulaPrime formulaPrime, ArrayList<String> history, boolean cont) throws QuantifierNotFoundException {
 
+/*        TODO change these traversal methods to have some concept of what should be expected.
+
+E.g. NEXT A, then if not A at this point return  error
+
+e.g. Always A until act Q then B: A expected, if Q occurs, then B is expected.
+
+e.g Finally A, A is expected, but if it is not A, we can continue
+
+This likely meeds to be work recursively with some sort of FIFO opperation
+
+So  E ( b pUq a ), would be b is expected with action p, until action q, which changes expected to a.
+
+AzFb(g && AG( A ( True cUd EF ( p || q ) ) ))
+
+TODO this should also only be for state opperators
+TODO maybe we need expected action too?
+TODO what does EF and AG actually mean? How are these different ?
+so here label g is expected, and Always( action c occurs (need expected action, until action d, then at some point state label has to contain p or q
+        */
         boolean trueAtSomePoint = false;
         if (transitions.isEmpty()) {
             return true;
@@ -127,6 +146,11 @@ public class SimpleModelChecker implements ModelChecker {
 
                 String next = t.getTarget();
                 transitions.remove(t);
+
+
+//                lets do constraint first
+
+
 //                TODO evaluate if formula nad constraint are true at this point
 //                Maybe we want to split up model and just pass in current execution
 //                path specific quantifier case
