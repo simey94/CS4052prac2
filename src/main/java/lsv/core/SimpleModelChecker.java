@@ -84,7 +84,10 @@ public class SimpleModelChecker implements ModelChecker {
                 history.add(state.getName());
 //                TODO evaluate if formula nad constraint are true at this point
 //                Maybe we want to split up model and just pass in current execution
-                if (!helper(transitions, state.getName(), constraint, formulaPrime, history, cont)) {
+                // expected[0] = string
+                // expected[1] = array of actions
+                Object[] expected = new Object[2];
+                if (!helper(transitions, state.getName(), formulaPrime, history, cont, expected)) {
                     if (!cont) {
                         throw new NotValidException(history);
                     } else {
@@ -107,7 +110,6 @@ public class SimpleModelChecker implements ModelChecker {
      * @throws QuantifierNotFoundException
      */
 
-    private boolean helper(ArrayList<Transition> transitions, String stateName, FormulaPrime constraint, FormulaPrime formulaPrime, ArrayList<String> history, boolean cont) throws QuantifierNotFoundException {
 
     /*  TODO change these traversal methods to have some concept of what should be expected.
 
@@ -123,18 +125,24 @@ public class SimpleModelChecker implements ModelChecker {
 
     AzFb(g && AG( A ( True cUd EF ( p || q ) ) ))
 
-        TODO this should also only be for state opperators
+        TODO this should also only be for state operators
         TODO maybe we need expected action too?
         TODO what does EF and AG actually mean? How are these different ?
      so here label g is expected, and Always( action c occurs (need expected action, until action d, then at some point state label has to contain p or q
     */
+    private boolean helper(ArrayList<Transition> transitions, String stateName, FormulaPrime formulaPrime, ArrayList<String> history, boolean cont, Object[] expected) throws QuantifierNotFoundException {
+
         boolean trueAtSomePoint = false;
+
         if (transitions.isEmpty()) {
             return true;
         }
-//        if constraint is true, return false - can't use this branch
-//        if formula is false, return false - can't use this branch
-//        if always, break at first error -
+
+        // avoid cycles
+        if (history.contains(stateName)) {
+            return true;
+        }
+
         history.add(stateName);
         for (Transition t : transitions) {
             if (t.getSource() == stateName) {
@@ -144,15 +152,7 @@ public class SimpleModelChecker implements ModelChecker {
                 String next = t.getTarget();
                 transitions.remove(t);
 
-
-//                lets do constraint first
-
-
-//                TODO evaluate if formula nad constraint are true at this point
-//                Maybe we want to split up model and just pass in current execution
-//                path specific quantifier case
                 switch (formulaPrime.getQauntifier().charAt(1)) {
-
 //                    TODO need to actually deal with what we want to do - so figure out what we are evaluating
                     case ('X'):
                         // next
@@ -167,10 +167,9 @@ public class SimpleModelChecker implements ModelChecker {
                         break;
                     default:
                         throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
-
                 }
 
-                if (!helper(transitions, next, constraint, formulaPrime, history, cont)) {
+                if (!helper(transitions, next, formulaPrime, history, cont, expected)) {
 
                     if (!cont)
                         return false;
@@ -185,7 +184,6 @@ public class SimpleModelChecker implements ModelChecker {
 
         return trueAtSomePoint;
     }
-
 
     //     TODO DO WE NEED THIS?
     private void evaluate(Model model, FormulaPrime constraint, FormulaPrime formulaPrime) throws NotValidException, QuantifierNotFoundException {
