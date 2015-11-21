@@ -4,6 +4,7 @@ import lsv.grammar.Formula;
 import lsv.grammar.FormulaElement;
 import lsv.grammar.FormulaPrime;
 import lsv.model.Model;
+import lsv.model.PointOfExecution;
 import lsv.model.State;
 import lsv.model.Transition;
 
@@ -105,6 +106,7 @@ public class SimpleModelChecker implements ModelChecker {
 //    TODO deal with PATH QUANTIFIERS
     private boolean helper(Model model, Transition prev, ArrayList<Transition> transitions, State state, FormulaPrime formulaPrime, ArrayList<String> history) throws QuantifierNotFoundException, OperatorNotSupportedException {
         boolean trueAtSomePoint = false;
+        PointOfExecution poe = new PointOfExecution();
         if (transitions.isEmpty()) {
             return true;
         }

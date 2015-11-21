@@ -1,0 +1,35 @@
+"states": [
+{
+"init": true,
+"name": "noneCrit1nonCrit2",
+"label" : "noneCrit1nonCrit2"
+},
+{
+"init": true,
+"name" : "crit1noncrit2",
+"label": "noneCritOne"
+},
+],
+"transitions": [
+{
+"source": "noneCrit1nonCrit2",
+"target": "crit1noncrit2",
+"actions": ["request"]
+},
+{
+"source": "s0",
+"target": "s2",
+"actions": ["act2"]
+},
+{
+"source": "s1",
+"target": "s2",
+"actions": ["act2"]
+},
+{
+"source": "s2",
+"target": "s0",
+"actions": ["act2"]
+}
+]
+}
