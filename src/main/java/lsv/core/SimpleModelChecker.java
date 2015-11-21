@@ -3,10 +3,7 @@ package lsv.core;
 import lsv.grammar.Formula;
 import lsv.grammar.FormulaElement;
 import lsv.grammar.FormulaPrime;
-import lsv.model.Model;
-import lsv.model.PointOfExecution;
-import lsv.model.State;
-import lsv.model.Transition;
+import lsv.model.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,64 +31,32 @@ public class SimpleModelChecker implements ModelChecker {
         return false;
     }
 
+
+    //    TODO deal with error trace
     public String[] getTrace() {
         return (String[]) globHistory.toArray();
     }
 
 
-    public boolean checkOperators(String operator, FormulaPrime formula, State state, Transition prev, Model model, ArrayList<Transition> transitions, ArrayList<String> history) throws OperatorNotSupportedException, QuantifierNotFoundException {
-        FormulaElement[] vals = formula.getVals();
-        switch (operator) {
-
-            case ("||"):
-                return (state.isTrue(vals[0]) || state.isTrue(vals[1]));
-            case ("&&"):
-                return (state.isTrue(vals[0]) && state.isTrue(vals[1]));
-            case ("!"):
-                return !(state.isTrue(vals[0]));
-            case ("=>"):
-                return (!state.isTrue(vals[0]) || state.isTrue(vals[1]));
-            case ("<=>"):
-                return ((!state.isTrue(vals[0]) && !state.isTrue(vals[1])) || (state.isTrue(vals[0]) && state.isTrue(vals[1])));
-            case ("U"):
-                if (share(prev.getActions(), (formula.getActions()[0]))) {
-                    if (!state.containsLabel(formula.getVals()[0])) {
-                        return false;
-                    } else {
-                        traverse(model, transitions, state, formula, history);
-                    }
-                } else if (share(prev.getActions(), (formula.getActions()[1]))) {
-                    return state.containsLabel(formula.getVals()[1]);
-                }
-                break;
-            default:
-                throw new OperatorNotSupportedException(operator);
-        }
-    }
-
-
-    /**
-     * Identifies init states.
-     *
-     * @param model
-     * @param cont  - True if global quantifier is E, False if global quantifier is A
-     * @return
-     * @throws NotValidException
-     */
-
     private boolean traverseModel(Model model, FormulaPrime formulaPrime, FormulaPrime constraint, boolean cont) throws NotValidException, QuantifierNotFoundException, OperatorNotSupportedException {
+
+        PointOfExecution next = null;
         boolean trueAtSomePoint = false;
         ArrayList<Transition> transitions = (ArrayList<Transition>) Arrays.asList(model.getTransitions());
 
 
         for (State state : model.getStates()) {
             if (state.isInit()) {
-                ArrayList<String> history = new ArrayList<String>();
-                history.add(state.getName());
-                Object[] expected = new Object[2];
-                if (!helper(model, null, transitions, state, formulaPrime, history)) {
+
+                try {
+                    next = new PointOfExecution(state, null, null, model);
+                } catch (CycleException e) {
+                    e.printStackTrace();
+                    System.err.println("This should not occur");
+                }
+                if (!helper(model, next, formulaPrime)) {
                     if (!cont) {
-                        throw new NotValidException(history);
+                        throw new NotValidException(next);
                     }
                 } else {
                     trueAtSomePoint = true;
@@ -102,82 +67,125 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-    //    TODO helper should be able to evaluate any CTL
-//    TODO deal with PATH QUANTIFIERS
-    private boolean helper(Model model, Transition prev, ArrayList<Transition> transitions, State state, FormulaPrime formulaPrime, ArrayList<String> history) throws QuantifierNotFoundException, OperatorNotSupportedException {
-        boolean trueAtSomePoint = false;
-        PointOfExecution poe = new PointOfExecution();
-        if (transitions.isEmpty()) {
-            return true;
-        }
-        // avoid cycles
-        if (history.contains(state.getName())) {
-            return true;
-        }
-        history.add(state.getName());
+    public boolean checkOperators(String operator, FormulaPrime formula, PointOfExecution poe, Model model) throws OperatorNotSupportedException, QuantifierNotFoundException, NotValidException {
 
-        switch (formulaPrime.getQauntifier().charAt(1)) {
-            case ('X'):
-                if (formulaPrime.getVals()[0].equals(state.getName())) {
-                    for (Transition t : transitions) {
-                        if (t.getSource().equals(state.getName())) {
-                            transitions.remove(t);
-                            history.add(t.toString());
-                            State next = model.getStateFromName(t.getTarget());
+        FormulaElement[] vals = formula.getVals();
+        switch (operator) {
+
+            case ("||"):
+                return (poe.getCurrentState().isTrue(vals[0]) || poe.getCurrentState().isTrue(vals[1]));
+            case ("&&"):
+                return (poe.getCurrentState().isTrue(vals[0]) && poe.getCurrentState().isTrue(vals[1]));
+            case ("!"):
+                return !(poe.getCurrentState().isTrue(vals[0]));
+            case ("=>"):
+                return (!poe.getCurrentState().isTrue(vals[0]) || poe.getCurrentState().isTrue(vals[1]));
+            case ("<=>"):
+                return ((!poe.getCurrentState().isTrue(vals[0]) && !poe.getCurrentState().isTrue(vals[1])) || (poe.getCurrentState().isTrue(vals[0]) && poe.getCurrentState().isTrue(vals[1])));
+            case ("U"):
+                if (share(poe.getLastTransition().getActions(), (formula.getActions()[0]))) {
+                    if (!poe.getCurrentState().containsLabel(formula.getVals()[0])) {
+                        return false;
+                    } else {
+                        traverse(model, formula, poe);
+                    }
+                } else if (share(poe.getLastTransition().getActions(), (formula.getActions()[1]))) {
+                    return poe.getCurrentState().containsLabel(formula.getVals()[1]);
+                }
+                break;
+            default:
+                throw new OperatorNotSupportedException(operator);
+        }
+        return false;
+    }
+
+
+    //    TODO deal with PATH QUANTIFIERS
+    private boolean helper(Model model, PointOfExecution poe, FormulaPrime formulaPrime) throws QuantifierNotFoundException, OperatorNotSupportedException, NotValidException {
+        boolean trueAtSomePoint = false;
+
+
+        if (!(formulaPrime.isMostNestedCTL())) {
+            for (int i = 0; i < 2; i++) {
+                FormulaElement fe = formulaPrime.getVals()[i];
+                if (fe instanceof FormulaPrime) {
+                    boolean val = helper(model, poe, (FormulaPrime) fe);
+                    if (!val) {
+                        throw new NotValidException(poe);
+                    } else {
+                        formulaPrime.setTautology(i);
+                    }
+                }
+                return checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model);
+            }
+        } else {
+            switch (formulaPrime.getQauntifier().charAt(1)) {
+                case ('X'):
+                    if (poe.getCurrentState().getLabelAsList().contains(formulaPrime.getVals()[0])) {
+                        for (Transition t : poe.getFutureTransitions()) {
+                            State nextState = model.getStateFromName(t.getTarget());
+                            PointOfExecution next = null;
+                            try {
+                                next = new PointOfExecution(nextState, poe, t, model);
+                            } catch (CycleException e) {
+                                continue;
+                            }
                             if (share(formulaPrime.getActions()[1], t.getActions())) {
-                                if (checkOperators(formulaPrime.getOperator(), formulaPrime.getVals(), next)) {
+                                if (checkOperators(formulaPrime.getOperator(), formulaPrime, next, model)) {
                                     return true;
                                 }
                             }
+
+                        }
+                        return false;
+                    } else {
+                        if (traverse(model, formulaPrime, poe))
+                            trueAtSomePoint = true;
+                    }
+
+                    break;
+                case ('G'):
+                    if (!share(formulaPrime.getActions()[1], (poe.getLastTransition()).getActions()) || (!checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model))) {
+                        return false;
+                    } else {
+                        if (traverse(model, formulaPrime, poe))
+                            trueAtSomePoint = true;
+
+                    }
+                    break;
+                case ('F'):
+                    if (share(formulaPrime.getActions()[1], (poe.getLastTransition()).getActions())) {
+                        if (checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model))
+                            return true;
+                    } else {
+                        if (traverse(model, formulaPrime, poe)) {
+                            trueAtSomePoint = true;
                         }
                     }
-                    return false;
-                } else {
-                    if (traverse(model, transitions, state, formulaPrime, history))
-                        trueAtSomePoint = true;
-                }
+                    break;
 
-                break;
-            case ('G'):
-                if (!share(formulaPrime.getActions()[1], (prev.getActions())) || (!checkOperators(formulaPrime.getOperator(), formulaPrime.getVals(), state))) {
-                    return false;
-                } else {
-                    if (traverse(model, transitions, state, formulaPrime, history))
-                        trueAtSomePoint = true;
+                default:
+                    throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
+            }
 
-                }
-                break;
-            case ('F'):
-                if (share(formulaPrime.getActions()[1], (prev.getActions()))) {
-                    if (checkOperators(formulaPrime.getOperator(), formulaPrime.getVals(), state))
-                        return true;
-                } else {
-                    if (traverse(model, transitions, state, formulaPrime, history)) {
-                        trueAtSomePoint = true;
-                    }
-                }
-                break;
-//            TODO handle until properly
-
-            default:
-                throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
         }
-
         return trueAtSomePoint;
     }
 
 
-    private boolean traverse(Model model, ArrayList<Transition> transitions, State state, FormulaPrime formulaPrime, ArrayList<String> history) throws QuantifierNotFoundException, OperatorNotSupportedException {
+    private boolean traverse(Model model, FormulaPrime formulaPrime, PointOfExecution poe) throws QuantifierNotFoundException, OperatorNotSupportedException, NotValidException {
         boolean trueAtSomePoint = false;
 
-        for (Transition t : transitions) {
-            if (t.getSource() == state.getName()) {
-                transitions.remove(t);
-                history.add(t.toString());
-                State next = model.getStateFromName(t.getTarget());
-                if (helper(model, t, transitions, next, formulaPrime, history)) {
-                    trueAtSomePoint = true;
-                }
+        for (Transition t : poe.getFutureTransitions()) {
+            State state = model.getStateFromName(t.getTarget());
+            PointOfExecution next = null;
+            try {
+                next = new PointOfExecution(state, poe, t, model);
+            } catch (CycleException e) {
+                return true; // if we have reached a cycle, return true
+            }
+            if (helper(model, next, formulaPrime)) {
+                trueAtSomePoint = true;
             }
         }
         return trueAtSomePoint;

@@ -65,4 +65,8 @@ public class FormulaPrime extends FormulaElement {
         }
         return true;
     }
+
+    public void setTautology(int position) {
+        vals[position] = new Tautology();
+    }
 }

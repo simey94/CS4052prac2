@@ -52,12 +52,10 @@ public class State {
         ArrayList<String> labels = getLabelAsList();
         if (!(val instanceof String)) {
             return false;
-//            TODO nested CTL here
         }
         if (((String) val).toLowerCase().equals("true")) {
             return true;
         }
-//            TODO deal with nestedCTL type
         return labels.contains(val);
 
     }
