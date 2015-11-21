@@ -30,7 +30,7 @@ public class Model {
      * @param stateName
      * @return state with corresponding name
      */
-    public State getStatefromName(String stateName) {
+    public State getStateFromName(String stateName) {
         for (State s : states) {
             if (s.getName().equals(stateName)) {
                 return s;
