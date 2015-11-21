@@ -49,4 +49,13 @@ public class FormulaPrime {
     public String getQauntifier() {
         return qauntifier;
     }
+
+    public Object[] getVals() {
+        return vals;
+
+    }
+
+    public String[][] getActions() {
+        return actions;
+    }
 }

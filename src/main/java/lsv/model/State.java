@@ -1,5 +1,8 @@
 package lsv.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  *
  * */
@@ -35,4 +38,23 @@ public class State {
         return label;
     }
 
+
+    public ArrayList<String> getLabelAsList() {
+        return new ArrayList<String>(Arrays.asList(label));
+    }
+
+
+    public Boolean containsLabel(Object val) {
+        ArrayList<String> labels = getLabelAsList();
+        if (!(val instanceof String)) {
+            return false;
+//            TODO nested CTL here
+        }
+        if (((String) val).toLowerCase().equals("true")) {
+            return true;
+        }
+//            TODO deal with nestedCTL type
+        return labels.contains(val);
+
+    }
 }

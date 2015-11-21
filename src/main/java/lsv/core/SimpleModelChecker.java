@@ -23,19 +23,10 @@ public class SimpleModelChecker implements ModelChecker {
 
     public boolean check(Model model, Formula constraint, Formula formula) {
 
-        try {
-            FormulaPrime formulaPrime = new FormulaPrime(formula);
-            FormulaPrime constraintPrime = new FormulaPrime(constraint);
-            evaluate(model, constraintPrime, formulaPrime);
-        } catch (NotValidException e) {
-            e.printStackTrace();
-        } catch (QuantifierNotFoundException e) {
-            e.printStackTrace();
-        }
 
-        // if constraint evaluates to false, don't consider this path
-
-        // analyse formula - what does it mean?
+        FormulaPrime formulaPrime = new FormulaPrime(formula);
+        FormulaPrime constraintPrime = new FormulaPrime(constraint);
+//            call traverse model
 
 
         return false;
@@ -87,7 +78,7 @@ public class SimpleModelChecker implements ModelChecker {
                 // expected[0] = string
                 // expected[1] = array of actions
                 Object[] expected = new Object[2];
-                if (!helper(transitions, state.getName(), formulaPrime, history, cont, expected)) {
+                if (!helper(model, null, transitions, state, formulaPrime, history)) {
                     if (!cont) {
                         throw new NotValidException(history);
                     } else {
@@ -100,15 +91,6 @@ public class SimpleModelChecker implements ModelChecker {
         }
         return trueAtSomePoint;
     }
-
-    /**
-     * @param transitions
-     * @param stateName
-     * @param history
-     * @param cont
-     * @return trueAtSomePoint
-     * @throws QuantifierNotFoundException
-     */
 
 
     /*  TODO change these traversal methods to have some concept of what should be expected.
@@ -130,100 +112,103 @@ public class SimpleModelChecker implements ModelChecker {
         TODO what does EF and AG actually mean? How are these different ?
      so here label g is expected, and Always( action c occurs (need expected action, until action d, then at some point state label has to contain p or q
     */
-    private boolean helper(ArrayList<Transition> transitions, String stateName, FormulaPrime formulaPrime, ArrayList<String> history, boolean cont, Object[] expected) throws QuantifierNotFoundException {
-
+    private boolean helper(Model model, Transition prev, ArrayList<Transition> transitions, State state, FormulaPrime formulaPrime, ArrayList<String> history) throws QuantifierNotFoundException {
         boolean trueAtSomePoint = false;
-
         if (transitions.isEmpty()) {
             return true;
         }
-
         // avoid cycles
-        if (history.contains(stateName)) {
+        if (history.contains(state.getName())) {
             return true;
         }
+        history.add(state.getName());
 
-        history.add(stateName);
-        for (Transition t : transitions) {
-            if (t.getSource() == stateName) {
-
-                history.add(t.toString());
-
-                String next = t.getTarget();
-                transitions.remove(t);
-
-                switch (formulaPrime.getQauntifier().charAt(1)) {
-//                    TODO need to actually deal with what we want to do - so figure out what we are evaluating
-                    case ('X'):
-                        // next
-                        break;
-                    case ('G'):
-                        break;
-                    case ('F'):
-                        break;
-                    case ('U'):
-                        break;
-                    case ('W'):
-                        break;
-                    default:
-                        throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
-                }
-
-                if (!helper(transitions, next, formulaPrime, history, cont, expected)) {
-
-                    if (!cont)
-                        return false;
-                    else {
-                        continue;
+        switch (formulaPrime.getQauntifier().charAt(1)) {
+            case ('X'):
+                if (formulaPrime.getVals()[0].equals(state.getName())) {
+                    for (Transition t : transitions) {
+                        if (t.getSource().equals(state.getName())) {
+                            transitions.remove(t);
+                            history.add(t.toString());
+                            State next = model.getStateFromName(t.getTarget());
+//                                    TODO check if this is valid
+                            if (share(formulaPrime.getActions()[1], t.getActions()) || (!(state.getLabelAsList().contains(formulaPrime.getVals()[1].toString())))) {
+                                return true;
+                            }
+                        }
                     }
+                    return false;
                 } else {
-                    trueAtSomePoint = true;
+                    if (traverse(model, transitions, state, formulaPrime, history))
+                        trueAtSomePoint = true;
                 }
-            }
-        }
 
-        return trueAtSomePoint;
-    }
+                break;
+            case ('G'):
+                if (!share(formulaPrime.getActions()[1], (prev.getActions())) || (!(state.getLabelAsList().contains(formulaPrime.getVals()[1].toString())))) {
+                    return false;
+                } else {
+                    if (traverse(model, transitions, state, formulaPrime, history))
+                        trueAtSomePoint = true;
 
-    //     TODO DO WE NEED THIS?
-    private void evaluate(Model model, FormulaPrime constraint, FormulaPrime formulaPrime) throws NotValidException, QuantifierNotFoundException {
-        switch (formulaPrime.getQauntifier().charAt(0)) {
-//            Globally - Has to hold entire subsequent path
-            case ('E'):
-                switch (formulaPrime.getQauntifier()) {
-//            Eventually finally - might be true at some point
-                    case ("E"):
-                        // traverseModel()
-                        break;
-                    case ("EF"):
-                        break;
-//            Eventually globally
-                    case ("EG"):
-                        break;
-//            Next - next this happens
-                    case ("EX"):
-                        break;
                 }
                 break;
-            case ('A'):
-                switch (formulaPrime.getQauntifier()) {
-//            always finally - always
-                    case ("AF"):
-//            always all paths
-                    case ("A"):
-                        break;
-//            Always Globally - from here on (all paths), true no matter what happens
-                    case ("AG"):
-                        break;
-//            always the next branch holds
-                    case ("AX"):
-                        break;
+            case ('F'):
+                if (share(formulaPrime.getActions()[1], (prev.getActions())) || (state.getLabelAsList().contains(formulaPrime.getVals()[1].toString()))) {
+                    return true;
+                } else {
+                    if (traverse(model, transitions, state, formulaPrime, history)) {
+                        trueAtSomePoint = true;
+                    }
+                }
+                break;
+            case ('U'):
+                if (share(prev.getActions(), (formulaPrime.getActions()[0]))) {
+                    if (!state.containsLabel(formulaPrime.getVals()[0])) {
+                        return false;
+                    } else {
+                        traverse(model, transitions, state, formulaPrime, history);
+                    }
+                } else if (share(prev.getActions(), (formulaPrime.getActions()[1]))) {
+                    return state.containsLabel(formulaPrime.getVals()[1]);
                 }
                 break;
             default:
                 throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
         }
+
+        return trueAtSomePoint;
     }
+
+
+    private boolean traverse(Model model, ArrayList<Transition> transitions, State state, FormulaPrime formulaPrime, ArrayList<String> history) throws QuantifierNotFoundException {
+        boolean trueAtSomePoint = false;
+
+        for (Transition t : transitions) {
+            if (t.getSource() == state.getName()) {
+                transitions.remove(t);
+                history.add(t.toString());
+                State next = model.getStateFromName(t.getTarget());
+                if (helper(model, t, transitions, next, formulaPrime, history)) {
+                    trueAtSomePoint = true;
+                }
+            }
+        }
+        return trueAtSomePoint;
+    }
+
+
+    private boolean share(String[] one, String[] two) {
+        for (int i = 0; i < one.length; i++) {
+            for (int h = 0; h < two.length; h++) {
+                if (one[i].equals(two[h])) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
 }
 

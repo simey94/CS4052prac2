@@ -1,6 +1,7 @@
 package lsv.core;
 
 import lsv.grammar.Formula;
+import lsv.grammar.FormulaPrime;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -53,8 +54,7 @@ public class FormulaTest {
     @Test
     public void parseCtl() {
         Formula formula = Builder.buildFormula("src/test/resources/ctl.json");
-
-
+        FormulaPrime fp = new FormulaPrime(formula);
         assertEquals("AF", formula.getQuantifier());
         assertEquals("g", formula.getAp()[0]);
 
