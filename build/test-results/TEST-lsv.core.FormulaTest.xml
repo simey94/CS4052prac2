@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="lsv.core.FormulaTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2015-11-20T22:41:59" hostname="8afbe54c.st-andrews.ac.uk" time="2636.253">
+<testsuite name="lsv.core.FormulaTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2015-11-21T15:19:02" hostname="Michaels-MBP-2" time="11874.672">
   <properties/>
-  <testcase name="parseConstraint1" classname="lsv.core.FormulaTest" time="0.229"/>
-  <testcase name="parseCtl2" classname="lsv.core.FormulaTest" time="2636.011"/>
+  <testcase name="parseConstraint1" classname="lsv.core.FormulaTest" time="0.109"/>
+  <testcase name="parseCtl2" classname="lsv.core.FormulaTest" time="0.0"/>
   <testcase name="parseCTLFromString" classname="lsv.core.FormulaTest" time="0.0"/>
-  <testcase name="parseCtl" classname="lsv.core.FormulaTest" time="0.01"/>
+  <testcase name="parseCtl" classname="lsv.core.FormulaTest" time="11874.561"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
