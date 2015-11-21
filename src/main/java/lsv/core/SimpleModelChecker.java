@@ -37,22 +37,23 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-    // TODO move this shiz
-//        switch (f.getOperator()) {
-//
-//            case ("||"):
-//                return (valid[0] || valid[1]);
-//            case ("&&"):
-//                return (valid[0] && valid[1]);
-//            case ("!"):
-//                return !(valid[0] && valid[1]);
-//            case ("=>"):
-//                return (!valid[0] || valid[1]);
-//            case ("<=>"):
-//                break;
-//            default:
-//                break;
-//        }
+    public boolean checkOperators(String operator, String[] vals, ArrayList<Transition> transitions, State state) throws OperatorNotSupportedException {
+        switch (operator) {
+
+            case ("||"):
+                return (state.getLabelAsList().contains(vals[0]) || state.getLabelAsList().contains(vals[1]));
+            case ("&&"):
+                return (state.getLabelAsList().contains(vals[0]) && state.getLabelAsList().contains(vals[1]));
+            case ("!"):
+                return !(state.getLabelAsList().contains(vals[0]));
+            case ("=>"):
+                return (!state.getLabelAsList().contains(vals[0]) || state.getLabelAsList().contains(vals[1]));
+            case ("<=>"):
+                return ((!state.getLabelAsList().contains(vals[0]) && !state.getLabelAsList().contains(vals[1])) || (state.getLabelAsList().contains(vals[0]) && state.getLabelAsList().contains(vals[1])));
+            default:
+                throw new OperatorNotSupportedException(operator);
+        }
+    }
 
 
     /**
@@ -132,7 +133,7 @@ public class SimpleModelChecker implements ModelChecker {
                             history.add(t.toString());
                             State next = model.getStateFromName(t.getTarget());
 //                                    TODO check if this is valid
-                            if (share(formulaPrime.getActions()[1], t.getActions()) || (!(state.getLabelAsList().contains(formulaPrime.getVals()[1].toString())))) {
+                            if (share(formulaPrime.getActions()[1], t.getActions()) || (!(next.getLabelAsList().contains(formulaPrime.getVals()[1].toString())))) {
                                 return true;
                             }
                         }
