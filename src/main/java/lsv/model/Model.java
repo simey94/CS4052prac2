@@ -23,5 +23,14 @@ public class Model {
 	return transitions;
     }
 
+
+    public State getStatefromName(String stateName) {
+        for (State s : states) {
+            if (s.getName().equals(stateName)) {
+                return s;
+            }
+        }
+        return null;
+    }
 }
 
