@@ -24,6 +24,12 @@ public class Model {
     }
 
 
+    /**
+     * Gets a state with a given name
+     *
+     * @param stateName
+     * @return state with corresponding name
+     */
     public State getStatefromName(String stateName) {
         for (State s : states) {
             if (s.getName().equals(stateName)) {
@@ -33,4 +39,5 @@ public class Model {
         return null;
     }
 }
+
 
