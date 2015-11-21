@@ -1,5 +1,5 @@
 {
-	"formula": "AzFb(g && AG( A ( True cUd EF ( p || q ) ) ))",
+	"formula": "AzFb(g && AG( A ( True cUd EF ( !p || q ) ) ))",
 	//	for all actions z and eventually b if g AND Always Globally (true C until d eventually finally p or q.
 	"b": ["act1", "act2"],
 	"z": ["act3", "act4"],

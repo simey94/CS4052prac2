@@ -5,15 +5,16 @@ package lsv.grammar;
  */
 public class FormulaPrime {
 
-    private Object[] vals = new Object[2];
-    private String qauntifier;
-    private String operator;
+    private FormulaElement[] vals = new FormulaElement[2];
+    private Quantifier qauntifier;
+    private Operator operator;
     private String[][] actions;
 
 
     /**
-     * Conyahstructor
+     * Constructor
      */
+
     public FormulaPrime(Formula f) {
         //parse formula
         qauntifier = f.getQuantifier();
