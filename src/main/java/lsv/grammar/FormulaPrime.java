@@ -3,7 +3,7 @@ package lsv.grammar;
 /**
  * A more OOP approach to the supplied Formula class.
  */
-public class FormulaPrime {
+public class FormulaPrime extends FormulaElement {
 
     private FormulaElement[] vals = new FormulaElement[2];
     private Quantifier qauntifier;
@@ -17,14 +17,13 @@ public class FormulaPrime {
 
     public FormulaPrime(Formula f) {
         //parse formula
-        qauntifier = f.getQuantifier();
-        operator = f.getOperator();
+        qauntifier = new Quantifier(f.getQuantifier());
+        operator = new Operator(f.getOperator());
 
-        boolean[] valid = new boolean[2];
         if (f.getAp()[0] != null) {
-            vals[0] = f.getAp()[0];
+            vals[0] = new AtomicProp(f.getAp()[0]);
         } else if (f.getTautology()[0] != null) {
-            vals[0] = true;
+            vals[0] = new Tautology();
         } else if (f.getNestedCTL()[0] != null) {
             vals[0] = new FormulaPrime(f.getNestedCTL()[0]);
         } else if (f.getActions()[0] != null) {
@@ -32,9 +31,9 @@ public class FormulaPrime {
         }
 
         if (f.getAp()[1] != null) {
-            vals[1] = f.getAp()[1];
+            vals[1] = new AtomicProp(f.getAp()[1]);
         } else if (f.getTautology()[1] != null) {
-            vals[1] = true;
+            vals[1] = new Tautology();
         } else if (f.getNestedCTL()[1] != null) {
             vals[1] = new FormulaPrime(f.getNestedCTL()[1]);
         } else if (f.getActions()[1] != null) {
@@ -44,11 +43,11 @@ public class FormulaPrime {
     }
 
     public String getOperator() {
-        return operator;
+        return operator.getOperator();
     }
 
     public String getQauntifier() {
-        return qauntifier;
+        return qauntifier.getQuantifier();
     }
 
     public Object[] getVals() {
