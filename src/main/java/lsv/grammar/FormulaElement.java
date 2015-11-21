@@ -6,4 +6,9 @@ package lsv.grammar;
 public abstract class FormulaElement {
 
     private boolean negation;
+
+
+    public boolean getNegation() {
+        return negation;
+    }
 }

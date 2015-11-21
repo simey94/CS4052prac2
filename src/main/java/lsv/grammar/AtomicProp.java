@@ -11,4 +11,7 @@ public class AtomicProp extends FormulaElement {
         this.ap = ap;
     }
 
+    public String getAp() {
+        return ap;
+    }
 }

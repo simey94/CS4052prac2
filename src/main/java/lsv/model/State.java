@@ -1,5 +1,9 @@
 package lsv.model;
 
+import lsv.grammar.AtomicProp;
+import lsv.grammar.FormulaElement;
+import lsv.grammar.Tautology;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -56,5 +60,23 @@ public class State {
 //            TODO deal with nestedCTL type
         return labels.contains(val);
 
+    }
+
+    public boolean isTrue(FormulaElement formulaElement) {
+        // if instance of ap check if array list contains that
+        if (formulaElement instanceof AtomicProp) {
+            ArrayList<String> labels = getLabelAsList();
+            if (formulaElement.getNegation()) {
+                return !(labels.contains(((AtomicProp) formulaElement).getAp()));
+            } else return (labels.contains(((AtomicProp) formulaElement).getAp()));
+        }
+
+        // if instance of tut is true return true
+        if (formulaElement instanceof Tautology) {
+            return !formulaElement.getNegation();
+        }
+        // if nestedCTL recursively eval
+
+        return false;
     }
 }

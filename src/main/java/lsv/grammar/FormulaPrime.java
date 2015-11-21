@@ -39,7 +39,6 @@ public class FormulaPrime extends FormulaElement {
         } else if (f.getActions()[1] != null) {
             actions[1] = f.getActions()[1];
         }
-
     }
 
     public String getOperator() {
@@ -52,7 +51,6 @@ public class FormulaPrime extends FormulaElement {
 
     public Object[] getVals() {
         return vals;
-
     }
 
     public String[][] getActions() {
