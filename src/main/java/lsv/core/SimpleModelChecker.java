@@ -101,7 +101,6 @@ public class SimpleModelChecker implements ModelChecker {
         return trueAtSomePoint;
     }
 
-
     //    TODO helper should be able to evaluate any CTL
 //    TODO deal with PATH QUANTIFIERS
     private boolean helper(Model model, Transition prev, ArrayList<Transition> transitions, State state, FormulaPrime formulaPrime, ArrayList<String> history) throws QuantifierNotFoundException, OperatorNotSupportedException {

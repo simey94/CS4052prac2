@@ -1,12 +1,8 @@
 package lsv.core;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-
-import lsv.model.Model;
-
 import lsv.grammar.Formula;
+import lsv.model.Model;
+import org.junit.Test;
 
 
 public class ModelCheckerTest {
@@ -16,6 +12,7 @@ public class ModelCheckerTest {
      * model checker itself.  The contents of model.json, constraint1.json and ctl.json are
      * just examples, you need to add new models and formulas for the mutual exclusion task.
      * */
+
     @Test
     public void buildAndCheckModel() {
 
