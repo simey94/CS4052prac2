@@ -49,11 +49,20 @@ public class FormulaPrime extends FormulaElement {
         return qauntifier.getQuantifier();
     }
 
-    public Object[] getVals() {
+    public FormulaElement[] getVals() {
         return vals;
     }
 
     public String[][] getActions() {
         return actions;
+    }
+
+    public boolean isMostNestedCTL() {
+        for (FormulaElement val : vals) {
+            if (val instanceof FormulaPrime) {
+                return false;
+            }
+        }
+        return true;
     }
 }

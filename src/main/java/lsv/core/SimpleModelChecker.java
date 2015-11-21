@@ -1,6 +1,7 @@
 package lsv.core;
 
 import lsv.grammar.Formula;
+import lsv.grammar.FormulaElement;
 import lsv.grammar.FormulaPrime;
 import lsv.model.Model;
 import lsv.model.State;
@@ -37,19 +38,31 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-    public boolean checkOperators(String operator, String[] vals, ArrayList<Transition> transitions, State state) throws OperatorNotSupportedException {
+    public boolean checkOperators(String operator, FormulaPrime formula, State state, Transition prev, Model model, ArrayList<Transition> transitions, ArrayList<String> history) throws OperatorNotSupportedException, QuantifierNotFoundException {
+        FormulaElement[] vals = formula.getVals();
         switch (operator) {
 
             case ("||"):
-                return (state.getLabelAsList().contains(vals[0]) || state.getLabelAsList().contains(vals[1]));
+                return (state.isTrue(vals[0]) || state.isTrue(vals[1]));
             case ("&&"):
-                return (state.getLabelAsList().contains(vals[0]) && state.getLabelAsList().contains(vals[1]));
+                return (state.isTrue(vals[0]) && state.isTrue(vals[1]));
             case ("!"):
-                return !(state.getLabelAsList().contains(vals[0]));
+                return !(state.isTrue(vals[0]));
             case ("=>"):
-                return (!state.getLabelAsList().contains(vals[0]) || state.getLabelAsList().contains(vals[1]));
+                return (!state.isTrue(vals[0]) || state.isTrue(vals[1]));
             case ("<=>"):
-                return ((!state.getLabelAsList().contains(vals[0]) && !state.getLabelAsList().contains(vals[1])) || (state.getLabelAsList().contains(vals[0]) && state.getLabelAsList().contains(vals[1])));
+                return ((!state.isTrue(vals[0]) && !state.isTrue(vals[1])) || (state.isTrue(vals[0]) && state.isTrue(vals[1])));
+            case ("U"):
+                if (share(prev.getActions(), (formula.getActions()[0]))) {
+                    if (!state.containsLabel(formula.getVals()[0])) {
+                        return false;
+                    } else {
+                        traverse(model, transitions, state, formula, history);
+                    }
+                } else if (share(prev.getActions(), (formula.getActions()[1]))) {
+                    return state.containsLabel(formula.getVals()[1]);
+                }
+                break;
             default:
                 throw new OperatorNotSupportedException(operator);
         }
@@ -65,7 +78,7 @@ public class SimpleModelChecker implements ModelChecker {
      * @throws NotValidException
      */
 
-    private boolean traverseModel(Model model, FormulaPrime formulaPrime, FormulaPrime constraint, boolean cont) throws NotValidException, QuantifierNotFoundException {
+    private boolean traverseModel(Model model, FormulaPrime formulaPrime, FormulaPrime constraint, boolean cont) throws NotValidException, QuantifierNotFoundException, OperatorNotSupportedException {
         boolean trueAtSomePoint = false;
         ArrayList<Transition> transitions = (ArrayList<Transition>) Arrays.asList(model.getTransitions());
 
@@ -74,16 +87,10 @@ public class SimpleModelChecker implements ModelChecker {
             if (state.isInit()) {
                 ArrayList<String> history = new ArrayList<String>();
                 history.add(state.getName());
-//                TODO evaluate if formula nad constraint are true at this point
-//                Maybe we want to split up model and just pass in current execution
-                // expected[0] = string
-                // expected[1] = array of actions
                 Object[] expected = new Object[2];
                 if (!helper(model, null, transitions, state, formulaPrime, history)) {
                     if (!cont) {
                         throw new NotValidException(history);
-                    } else {
-                        continue;
                     }
                 } else {
                     trueAtSomePoint = true;
@@ -94,26 +101,7 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-    /*  TODO change these traversal methods to have some concept of what should be expected.
-
-    E.g. NEXT A, then if not A at this point return  error
-
-    e.g. Always A until act Q then B: A expected, if Q occurs, then B is expected.
-
-    e.g Finally A, A is expected, but if it is not A, we can continue
-
-    This likely needs to be work recursively with some sort of FIFO operation
-
-    So  E ( b pUq a ), would be b is expected with action p, until action q, which changes expected to a.
-
-    AzFb(g && AG( A ( True cUd EF ( p || q ) ) ))
-
-        TODO this should also only be for state operators
-        TODO maybe we need expected action too?
-        TODO what does EF and AG actually mean? How are these different ?
-     so here label g is expected, and Always( action c occurs (need expected action, until action d, then at some point state label has to contain p or q
-    */
-    private boolean helper(Model model, Transition prev, ArrayList<Transition> transitions, State state, FormulaPrime formulaPrime, ArrayList<String> history) throws QuantifierNotFoundException {
+    private boolean helper(Model model, Transition prev, ArrayList<Transition> transitions, State state, FormulaPrime formulaPrime, ArrayList<String> history) throws QuantifierNotFoundException, OperatorNotSupportedException {
         boolean trueAtSomePoint = false;
         if (transitions.isEmpty()) {
             return true;
@@ -132,9 +120,10 @@ public class SimpleModelChecker implements ModelChecker {
                             transitions.remove(t);
                             history.add(t.toString());
                             State next = model.getStateFromName(t.getTarget());
-//                                    TODO check if this is valid
-                            if (share(formulaPrime.getActions()[1], t.getActions()) || (!(next.getLabelAsList().contains(formulaPrime.getVals()[1].toString())))) {
-                                return true;
+                            if (share(formulaPrime.getActions()[1], t.getActions())) {
+                                if (checkOperators(formulaPrime.getOperator(), formulaPrime.getVals(), next)) {
+                                    return true;
+                                }
                             }
                         }
                     }
@@ -146,7 +135,7 @@ public class SimpleModelChecker implements ModelChecker {
 
                 break;
             case ('G'):
-                if (!share(formulaPrime.getActions()[1], (prev.getActions())) || (!(state.getLabelAsList().contains(formulaPrime.getVals()[1].toString())))) {
+                if (!share(formulaPrime.getActions()[1], (prev.getActions())) || (!checkOperators(formulaPrime.getOperator(), formulaPrime.getVals(), state))) {
                     return false;
                 } else {
                     if (traverse(model, transitions, state, formulaPrime, history))
@@ -155,25 +144,17 @@ public class SimpleModelChecker implements ModelChecker {
                 }
                 break;
             case ('F'):
-                if (share(formulaPrime.getActions()[1], (prev.getActions())) || (state.getLabelAsList().contains(formulaPrime.getVals()[1].toString()))) {
-                    return true;
+                if (share(formulaPrime.getActions()[1], (prev.getActions()))) {
+                    if (checkOperators(formulaPrime.getOperator(), formulaPrime.getVals(), state))
+                        return true;
                 } else {
                     if (traverse(model, transitions, state, formulaPrime, history)) {
                         trueAtSomePoint = true;
                     }
                 }
                 break;
-            case ('U'):
-                if (share(prev.getActions(), (formulaPrime.getActions()[0]))) {
-                    if (!state.containsLabel(formulaPrime.getVals()[0])) {
-                        return false;
-                    } else {
-                        traverse(model, transitions, state, formulaPrime, history);
-                    }
-                } else if (share(prev.getActions(), (formulaPrime.getActions()[1]))) {
-                    return state.containsLabel(formulaPrime.getVals()[1]);
-                }
-                break;
+//            TODO handle until properly
+
             default:
                 throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
         }
@@ -182,7 +163,7 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-    private boolean traverse(Model model, ArrayList<Transition> transitions, State state, FormulaPrime formulaPrime, ArrayList<String> history) throws QuantifierNotFoundException {
+    private boolean traverse(Model model, ArrayList<Transition> transitions, State state, FormulaPrime formulaPrime, ArrayList<String> history) throws QuantifierNotFoundException, OperatorNotSupportedException {
         boolean trueAtSomePoint = false;
 
         for (Transition t : transitions) {
@@ -200,11 +181,9 @@ public class SimpleModelChecker implements ModelChecker {
 
 
     private boolean share(String[] one, String[] two) {
-        for (int i = 0; i < one.length; i++) {
+        for (String anOne : one) {
             for (int h = 0; h < two.length; h++) {
-                if (one[i].equals(two[h])) {
-                    return true;
-                }
+                if (anOne.equals(two[h])) return true;
             }
         }
         return false;
