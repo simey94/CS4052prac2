@@ -15,6 +15,27 @@ public class State {
     private String name;
     private String[] label;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        State state = (State) o;
+
+        if (init != state.init) return false;
+        if (!name.equals(state.name)) return false;
+        return Arrays.equals(label, state.label);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (init ? 1 : 0);
+        result = 31 * result + name.hashCode();
+        result = 31 * result + Arrays.hashCode(label);
+        return result;
+    }
+
     /**
      * Is state an initial state
      *

@@ -27,6 +27,14 @@ class NotValidException extends Exception
 
     }
 
+    public ArrayList<Transition> getTransitions() {
+        return transitions;
+    }
+
+    public ArrayList<State> getStates() {
+        return states;
+    }
+
     public ArrayList<String> getExceptionHistory() {
         ArrayList<String> temp = new ArrayList<String>();
         Queue<Transition> transitionsQueue = new LinkedList<>(transitions);
