@@ -94,25 +94,33 @@ public class SimpleModelChecker implements ModelChecker {
                 }
             }
         }
+
+        if (cont) {
+            return trueAtSomePoint;
+        } else if (!trueAtSomePoint) {
+            throw new NotValidException(next);
+        }
+
         return trueAtSomePoint;
     }
 
 
     public boolean checkOperators(String operator, FormulaPrime formula, PointOfExecution poe, Model model, boolean cont) throws OperatorNotSupportedException, QuantifierNotFoundException, NotValidException {
 
+        boolean temp = false;
         FormulaElement[] vals = formula.getVals();
         switch (operator) {
 
             case ("||"):
-                return (poe.getCurrentState().isTrue(vals[0]) || poe.getCurrentState().isTrue(vals[1]));
+                temp = (poe.getCurrentState().isTrue(vals[0]) || poe.getCurrentState().isTrue(vals[1]));
             case ("&&"):
-                return (poe.getCurrentState().isTrue(vals[0]) && poe.getCurrentState().isTrue(vals[1]));
+                temp = (poe.getCurrentState().isTrue(vals[0]) && poe.getCurrentState().isTrue(vals[1]));
             case ("!"):
-                return !(poe.getCurrentState().isTrue(vals[0]));
+                temp = !(poe.getCurrentState().isTrue(vals[0]));
             case ("=>"):
-                return (!poe.getCurrentState().isTrue(vals[0]) || poe.getCurrentState().isTrue(vals[1]));
+                temp = (!poe.getCurrentState().isTrue(vals[0]) || poe.getCurrentState().isTrue(vals[1]));
             case ("<=>"):
-                return ((!poe.getCurrentState().isTrue(vals[0]) && !poe.getCurrentState().isTrue(vals[1])) || (poe.getCurrentState().isTrue(vals[0]) && poe.getCurrentState().isTrue(vals[1])));
+                temp = ((!poe.getCurrentState().isTrue(vals[0]) && !poe.getCurrentState().isTrue(vals[1])) || (poe.getCurrentState().isTrue(vals[0]) && poe.getCurrentState().isTrue(vals[1])));
             case ("U"):
                 if (share(poe.getLastTransition().getActions(), (formula.getActions()[0]))) {
                     if (!poe.getCurrentState().containsLabel(formula.getVals()[0])) {
@@ -121,13 +129,21 @@ public class SimpleModelChecker implements ModelChecker {
                         traverse(model, formula, poe, cont);
                     }
                 } else if (share(poe.getLastTransition().getActions(), (formula.getActions()[1]))) {
-                    return poe.getCurrentState().containsLabel(formula.getVals()[1]);
+                    temp = poe.getCurrentState().containsLabel(formula.getVals()[1]);
                 }
                 break;
             default:
                 throw new OperatorNotSupportedException(operator);
         }
-        return false;
+
+
+        if (cont) {
+            return temp;
+        } else if (!temp) {
+            throw new NotValidException(poe);
+        }
+
+        return true;
     }
 
 
@@ -168,7 +184,11 @@ public class SimpleModelChecker implements ModelChecker {
                         }
 
                     }
-                    return false;
+                    if (cont) {
+                        return false;
+                    } else {
+                        throw new NotValidException(poe);
+                    }
                 } else {
                     if (traverse(model, formulaPrime, poe, cont))
                         trueAtSomePoint = true;
@@ -177,7 +197,11 @@ public class SimpleModelChecker implements ModelChecker {
                 break;
             case ('G'):
                 if (!share(formulaPrime.getActions()[1], (poe.getLastTransition()).getActions()) || (!checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont))) {
-                    return false;
+                    if (cont) {
+                        return false;
+                    } else {
+                        throw new NotValidException(poe);
+                    }
                 } else {
                     if (traverse(model, formulaPrime, poe, cont))
                         trueAtSomePoint = true;
@@ -217,6 +241,14 @@ public class SimpleModelChecker implements ModelChecker {
                 trueAtSomePoint = true;
             }
         }
+
+
+        if (cont) {
+            return trueAtSomePoint;
+        } else if (!trueAtSomePoint) {
+            throw new NotValidException(poe);
+        }
+
         return trueAtSomePoint;
     }
 
