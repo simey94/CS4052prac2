@@ -4,6 +4,8 @@ import lsv.grammar.Formula;
 import lsv.model.Model;
 import org.junit.Test;
 
+import static junit.framework.TestCase.assertTrue;
+
 
 public class ModelCheckerTest {
 
@@ -25,7 +27,7 @@ public class ModelCheckerTest {
 	ModelChecker mc = new SimpleModelChecker();
 
 	// TO IMPLEMENT
-	//assertTrue(mc.check(model, fairnessConstraint, query));
+        assertTrue(mc.check(model, fairnessConstraint, query));
     }
 
 }

@@ -2,9 +2,6 @@ package lsv.model;
 
 import java.util.ArrayList;
 
-/**
- * Created by 120011995 on 21/11/15.
- */
 public class PointOfExecution {
 
     private State currentState;
@@ -30,6 +27,10 @@ public class PointOfExecution {
                 tempTransitions.add(currentTransition);
             }
             previousTransitions = tempTransitions;
+        } else {
+            previousTransitions = new ArrayList<Transition>();
+            previousStates = new ArrayList<State>();
+            futureTransitions = new ArrayList<Transition>();
         }
         for (Transition t : model.getTransitions()) {
             if (t.getSource() == currentState.getName()) {
@@ -44,7 +45,6 @@ public class PointOfExecution {
     public ArrayList<Transition> getFutureTransitions() {
         return futureTransitions;
     }
-
 
     public ArrayList<State> getPreviousStates() {
         return previousStates;

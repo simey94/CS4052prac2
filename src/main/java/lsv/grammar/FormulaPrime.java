@@ -69,4 +69,20 @@ public class FormulaPrime extends FormulaElement {
     public void setTautology(int position) {
         vals[position] = new Tautology();
     }
+
+    public FormulaElement getValuesAt(int index) {
+        if (vals == null || index > (vals.length - 1)) {
+            return null;
+        } else {
+            return vals[index];
+        }
+    }
+
+    public String[] getActionsAt(int index) {
+        if (actions == null || index > (actions.length - 1)) {
+            return null;
+        } else {
+            return actions[index];
+        }
+    }
 }

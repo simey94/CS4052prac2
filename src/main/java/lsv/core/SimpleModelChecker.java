@@ -20,8 +20,8 @@ public class SimpleModelChecker implements ModelChecker {
         FormulaPrime constraintPrime = new FormulaPrime(constraint);
         boolean cont;
         try {
-
-            switch (constraintPrime.getQauntifier().charAt(0)) {
+            String temp = constraintPrime.getQauntifier();
+            switch (temp.charAt(0)) {
                 case ('E'):
                     cont = true;
                     break;
@@ -31,7 +31,7 @@ public class SimpleModelChecker implements ModelChecker {
                 default:
                     throw new QuantifierNotFoundException(constraintPrime.getQauntifier());
             }
-            traverseModel(model, constraintPrime, cont);
+            checkInitStates(model, constraintPrime, cont);
         } catch (NotValidException e) {
             model.removeFromModel(e.getStates(), e.getTransitions());
         } catch (OperatorNotSupportedException e) {
@@ -53,7 +53,7 @@ public class SimpleModelChecker implements ModelChecker {
                     throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
             }
 
-            return traverseModel(model, formulaPrime, cont);
+            return checkInitStates(model, formulaPrime, cont);
         } catch (OperatorNotSupportedException e) {
             e.printStackTrace();
         } catch (QuantifierNotFoundException e) {
@@ -69,11 +69,11 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-    private boolean traverseModel(Model model, FormulaPrime formulaPrime, boolean cont) throws NotValidException, QuantifierNotFoundException, OperatorNotSupportedException {
+    private boolean checkInitStates(Model model, FormulaPrime formulaPrime, boolean cont) throws NotValidException, QuantifierNotFoundException, OperatorNotSupportedException {
 
         PointOfExecution next = null;
         boolean trueAtSomePoint = false;
-        ArrayList<Transition> transitions = (ArrayList<Transition>) Arrays.asList(model.getTransitions());
+        ArrayList<Transition> transitions = new ArrayList<>(Arrays.asList(model.getTransitions()));
 
 
         for (State state : model.getStates()) {
@@ -135,7 +135,6 @@ public class SimpleModelChecker implements ModelChecker {
             default:
                 throw new OperatorNotSupportedException(operator);
         }
-
 
         if (cont) {
             return temp;
@@ -209,7 +208,11 @@ public class SimpleModelChecker implements ModelChecker {
                 }
                 break;
             case ('F'):
-                if (share(formulaPrime.getActions()[1], (poe.getLastTransition()).getActions())) {
+                Transition last = poe.getLastTransition();
+                if (last == null) {
+                    traverse(model, formulaPrime, poe, cont);
+                }
+                if (share(formulaPrime.getActionsAt(1), (poe.getLastTransition()).getActions())) {
                     if (checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont))
                         return true;
                 } else {
@@ -254,6 +257,10 @@ public class SimpleModelChecker implements ModelChecker {
 
 
     private boolean share(String[] one, String[] two) {
+        if (one == null || two == null) {
+            return false;
+        }
+
         for (String anOne : one) {
             for (String aTwo : two) {
                 if (anOne.equals(aTwo)) return true;

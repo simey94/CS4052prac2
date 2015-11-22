@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="lsv.core.ModelCheckerTest" tests="1" skipped="0" failures="1" errors="0" timestamp="2015-11-21T18:36:57" hostname="Michaels-MBP-2" time="0.017">
+<testsuite name="lsv.core.ModelCheckerTest" tests="1" skipped="0" failures="1" errors="0" timestamp="2015-11-22T12:17:49" hostname="8afbeb82.st-andrews.ac.uk" time="76.853">
   <properties/>
-  <testcase name="buildAndCheckModel" classname="lsv.core.ModelCheckerTest" time="0.017">
-    <failure message="java.lang.NoClassDefFoundError: lsv/core/OperatorNotSupportedException" type="java.lang.NoClassDefFoundError">java.lang.NoClassDefFoundError: lsv/core/OperatorNotSupportedException
-	at lsv.core.ModelCheckerTest.buildAndCheckModel(ModelCheckerTest.java:28)
+  <testcase name="buildAndCheckModel" classname="lsv.core.ModelCheckerTest" time="76.853">
+    <failure message="junit.framework.AssertionFailedError" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError
+	at junit.framework.Assert.fail(Assert.java:55)
+	at junit.framework.Assert.assertTrue(Assert.java:22)
+	at junit.framework.Assert.assertTrue(Assert.java:31)
+	at junit.framework.TestCase.assertTrue(TestCase.java:201)
+	at lsv.core.ModelCheckerTest.buildAndCheckModel(ModelCheckerTest.java:30)
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -47,12 +51,6 @@
 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
 	at java.lang.Thread.run(Thread.java:745)
-Caused by: java.lang.ClassNotFoundException: lsv.core.OperatorNotSupportedException
-	at java.net.URLClassLoader.findClass(URLClassLoader.java:381)
-	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
-	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:331)
-	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
-	... 44 more
 </failure>
   </testcase>
   <system-out><![CDATA[]]></system-out>

@@ -48,8 +48,12 @@ public class Model {
         ArrayList<Transition> tempTransitions = new ArrayList<Transition>(Arrays.asList(transitions));
         tempStates.removeAll(statesToRemove);
         tempTransitions.removeAll(transitionsToRemove);
-        transitions = (Transition[]) tempTransitions.toArray();
-        states = (State[]) tempStates.toArray();
+        if (tempStates != null) {
+            states = tempStates.toArray(new State[tempStates.size()]);
+        }
+        if (tempTransitions != null) {
+            transitions = tempTransitions.toArray(new Transition[tempTransitions.size()]);
+        }
     }
 }
 
