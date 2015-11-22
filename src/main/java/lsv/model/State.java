@@ -23,8 +23,7 @@ public class State {
         State state = (State) o;
 
         if (init != state.init) return false;
-        if (!name.equals(state.name)) return false;
-        return Arrays.equals(label, state.label);
+        return name.equals(state.name) && Arrays.equals(label, state.label);
 
     }
 
@@ -65,7 +64,7 @@ public class State {
 
 
     public ArrayList<String> getLabelAsList() {
-        return new ArrayList<String>(Arrays.asList(label));
+        return new ArrayList<>(Arrays.asList(label));
     }
 
 
@@ -74,10 +73,7 @@ public class State {
         if (!(val instanceof String)) {
             return false;
         }
-        if (((String) val).toLowerCase().equals("true")) {
-            return true;
-        }
-        return labels.contains(val);
+        return ((String) val).toLowerCase().equals("true") || labels.contains(val);
 
     }
 
@@ -94,6 +90,7 @@ public class State {
         if (formulaElement instanceof Tautology) {
             return !formulaElement.getNegation();
         }
+
         // if nestedCTL recursively eval
 
         return false;

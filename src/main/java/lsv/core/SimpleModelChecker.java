@@ -19,30 +19,9 @@ public class SimpleModelChecker implements ModelChecker {
 
         FormulaPrime constraintPrime = new FormulaPrime(constraint);
         boolean cont;
-        try {
-            String temp = constraintPrime.getQauntifier();
-            switch (temp.charAt(0)) {
-                case ('E'):
-                    cont = true;
-                    break;
-                case ('A'):
-                    cont = false;
-                    break;
-                default:
-                    throw new QuantifierNotFoundException(constraintPrime.getQauntifier());
-            }
-            checkInitStates(model, constraintPrime, cont);
-        } catch (NotValidException e) {
-            model.removeFromModel(e.getStates(), e.getTransitions());
-        } catch (OperatorNotSupportedException e) {
-            e.printStackTrace();
-        } catch (QuantifierNotFoundException e) {
-            e.printStackTrace();
-        }
-
-//        FormulaPrime formulaPrime = new FormulaPrime(formula);
 //        try {
-//            switch (formulaPrime.getQauntifier().charAt(0)) {
+//            String temp = constraintPrime.getQauntifier();
+//            switch (temp.charAt(0)) {
 //                case ('E'):
 //                    cont = true;
 //                    break;
@@ -50,17 +29,38 @@ public class SimpleModelChecker implements ModelChecker {
 //                    cont = false;
 //                    break;
 //                default:
-//                    throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
+//                    throw new QuantifierNotFoundException(constraintPrime.getQauntifier());
 //            }
-//
-//            return checkInitStates(model, formulaPrime, cont);
+//            return checkInitStates(model, constraintPrime, cont);
+//        } catch (NotValidException e) {
+//            model.removeFromModel(e.getStates(), e.getTransitions());
 //        } catch (OperatorNotSupportedException e) {
 //            e.printStackTrace();
 //        } catch (QuantifierNotFoundException e) {
 //            e.printStackTrace();
-//        } catch (NotValidException e) {
-//            globHistory = e.getExceptionHistory();
 //        }
+
+        FormulaPrime formulaPrime = new FormulaPrime(formula);
+        try {
+            switch (formulaPrime.getQauntifier().charAt(0)) {
+                case ('E'):
+                    cont = true;
+                    break;
+                case ('A'):
+                    cont = false;
+                    break;
+                default:
+                    throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
+            }
+
+            return checkInitStates(model, formulaPrime, cont);
+        } catch (OperatorNotSupportedException e) {
+            e.printStackTrace();
+        } catch (QuantifierNotFoundException e) {
+            e.printStackTrace();
+        } catch (NotValidException e) {
+            globHistory = e.getExceptionHistory();
+        }
         return false;
     }
 
@@ -113,23 +113,31 @@ public class SimpleModelChecker implements ModelChecker {
 
             case ("||"):
                 temp = (poe.getCurrentState().isTrue(vals[0]) || poe.getCurrentState().isTrue(vals[1]));
+                break;
             case ("&&"):
                 temp = (poe.getCurrentState().isTrue(vals[0]) && poe.getCurrentState().isTrue(vals[1]));
+                break;
             case ("!"):
                 temp = !(poe.getCurrentState().isTrue(vals[0]));
+                break;
             case ("=>"):
                 temp = (!poe.getCurrentState().isTrue(vals[0]) || poe.getCurrentState().isTrue(vals[1]));
+                break;
             case ("<=>"):
                 temp = ((!poe.getCurrentState().isTrue(vals[0]) && !poe.getCurrentState().isTrue(vals[1])) || (poe.getCurrentState().isTrue(vals[0]) && poe.getCurrentState().isTrue(vals[1])));
             case ("U"):
                 if (share(poe.getLastTransition().getActions(), (formula.getActions()[0]))) {
-                    if (!poe.getCurrentState().containsLabel(formula.getVals()[0])) {
-                        return false;
+                    if (!poe.getCurrentState().isTrue(vals[0])) {
+                        if (cont) {
+                            return temp;
+                        } else if (!temp) {
+                            throw new NotValidException(poe);
+                        }
                     } else {
                         traverse(model, formula, poe, cont);
                     }
                 } else if (share(poe.getLastTransition().getActions(), (formula.getActions()[1]))) {
-                    temp = poe.getCurrentState().containsLabel(formula.getVals()[1]);
+                    temp = poe.getCurrentState().isTrue(vals[1]);
                 }
                 break;
             default:
@@ -145,13 +153,8 @@ public class SimpleModelChecker implements ModelChecker {
         return true;
     }
 
-
-    //    TODO deal with PATH QUANTIFIERS
-//    TODO Take in cont and work from there
     private boolean helper(Model model, PointOfExecution poe, FormulaPrime formulaPrime, boolean cont) throws QuantifierNotFoundException, OperatorNotSupportedException, NotValidException {
         boolean trueAtSomePoint = false;
-
-
         if (!(formulaPrime.isMostNestedCTL())) {
             for (int i = 0; i < 2; i++) {
                 FormulaElement fe = formulaPrime.getVals()[i];
@@ -167,10 +170,15 @@ public class SimpleModelChecker implements ModelChecker {
             return checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont);
         }
 
-        char stateQuantifier = formulaPrime.getQauntifier().charAt(1);
+        char stateQuantifier = 0;
+        if (formulaPrime.getQauntifier().length() > 1)
+            stateQuantifier = formulaPrime.getQauntifier().charAt(1);
         switch (stateQuantifier) {
             case ('X'):
-                if (poe.getCurrentState().getLabelAsList().contains(formulaPrime.getVals()[0])) {
+                Transition last = poe.getLastTransition();
+                if (last == null) { // means this is an initial transition
+                    return traverse(model, formulaPrime, poe, cont);
+                } else if (share(formulaPrime.getActions()[1], (poe.getLastTransition()).getActions())) {
                     for (Transition t : poe.getFutureTransitions()) {
                         State nextState = model.getStateFromName(t.getTarget());
                         PointOfExecution next;
@@ -181,24 +189,37 @@ public class SimpleModelChecker implements ModelChecker {
                         }
                         if (share(formulaPrime.getActions()[1], t.getActions())) {
                             if (checkOperators(formulaPrime.getOperator(), formulaPrime, next, model, cont)) {
-                                return true;
+                                trueAtSomePoint = traverse(model, formulaPrime, next, cont);
                             }
                         }
 
                     }
-                    if (cont) {
-                        return false;
+
+                    if (trueAtSomePoint) {
+                        return true;
                     } else {
-                        throw new NotValidException(poe);
+                        if (cont) {
+                            return false;
+                        } else {
+                            throw new NotValidException(poe);
+                        }
                     }
                 } else {
-                    if (traverse(model, formulaPrime, poe, cont))
-                        trueAtSomePoint = true;
+                    if (cont) { //means this hasn't occured at this point, but will occur at some point.
+                        return false;
+                    } else { // means this hasn't occured - so return erro
+                        throw new NotValidException(poe);
+                    }
                 }
-
-                break;
             case ('G'):
-                if (!share(formulaPrime.getActions()[1], (poe.getLastTransition()).getActions()) || (!checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont))) {
+                last = poe.getLastTransition();
+                if (last == null) {
+                    traverse(model, formulaPrime, poe, cont);
+                }
+                if (share(formulaPrime.getActions()[1], (poe.getLastTransition()).getActions())) {
+                    if (!checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont)) {
+                        return false;
+                    }
                     if (cont) {
                         return false;
                     } else {
@@ -210,22 +231,33 @@ public class SimpleModelChecker implements ModelChecker {
                 }
                 break;
             case ('F'):
-                Transition last = poe.getLastTransition();
+                last = poe.getLastTransition();
                 if (last == null) {
                     traverse(model, formulaPrime, poe, cont);
-                }
-                if (share(formulaPrime.getActionsAt(1), (poe.getLastTransition()).getActions())) {
-                    if (checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont))
-                        return true;
-                } else {
+                } else if (share(formulaPrime.getActionsAt(1), (last.getActions()))) { // if Fb , b has tow occurred
+                    return checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont);
+                } else { // if AaFb, check a has occured
+                    if (formulaPrime.getActionsAt(0) != null) { // if AaFb, check that something is at a position
+                        if (!cont) { //check if A
+                            if (!share(formulaPrime.getActionsAt(0), (last.getActions()))) {
+                                throw new NotValidException(poe);
+                            }
+                        }
+                    }
                     if (traverse(model, formulaPrime, poe, cont)) {
                         trueAtSomePoint = true;
                     }
                 }
                 break;
 
-            default:
-                throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
+            default: // could just be A or E
+                last = poe.getLastTransition();
+                if (last == null) { // means this is an initial transition
+                    return traverse(model, formulaPrime, poe, cont);
+                } else {
+                    boolean check = checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont);
+                    return check;
+                }
         }
         return trueAtSomePoint;
     }
@@ -240,7 +272,7 @@ public class SimpleModelChecker implements ModelChecker {
             try {
                 next = new PointOfExecution(state, poe, t, model);
             } catch (CycleException e) {
-                return true; // if we have reached a cycle, return true
+                continue; // if we have reached a cycle, return false, this path canot be taken
             }
             if (helper(model, next, formulaPrime, cont)) {
                 trueAtSomePoint = true;
@@ -252,7 +284,6 @@ public class SimpleModelChecker implements ModelChecker {
         } else if (!trueAtSomePoint) {
             throw new NotValidException(poe);
         }
-
         return trueAtSomePoint;
     }
 

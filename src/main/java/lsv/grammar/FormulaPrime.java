@@ -9,7 +9,7 @@ public class FormulaPrime extends FormulaElement {
     private Quantifier qauntifier;
     private Operator operator;
     private String[][] actions = new String[2][];
-
+    private boolean mostNestedCTL = true;
 
     /**
      * Constructor
@@ -26,6 +26,7 @@ public class FormulaPrime extends FormulaElement {
             vals[0] = new Tautology();
         } else if (f.getNestedCTL()[0] != null) {
             vals[0] = new FormulaPrime(f.getNestedCTL()[0]);
+            mostNestedCTL = false;
         }
         if (f.getAp()[1] != null) {
             vals[1] = new AtomicProp(f.getAp()[1]);
@@ -33,6 +34,7 @@ public class FormulaPrime extends FormulaElement {
             vals[1] = new Tautology();
         } else if (f.getNestedCTL()[1] != null) {
             vals[1] = new FormulaPrime(f.getNestedCTL()[1]);
+            mostNestedCTL = false;
         }
         if (f.getActions() != null) {
             String[][] act = f.getActions();
@@ -43,6 +45,10 @@ public class FormulaPrime extends FormulaElement {
                 actions[1] = act[1];
             }
         }
+    }
+
+    public boolean isMostNestedCTL() {
+        return mostNestedCTL;
     }
 
     public String getOperator() {
@@ -59,15 +65,6 @@ public class FormulaPrime extends FormulaElement {
 
     public String[][] getActions() {
         return actions;
-    }
-
-    public boolean isMostNestedCTL() {
-        for (FormulaElement val : vals) {
-            if (val instanceof FormulaPrime) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public void setTautology(int position) {
