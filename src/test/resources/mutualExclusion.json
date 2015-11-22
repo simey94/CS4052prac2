@@ -19,7 +19,7 @@
       "init": false,
       "name": "Crit1Crit2",
       "label": "CritOneCritTwo"
-    },
+    }
   ],
   "transitions": [
     {
