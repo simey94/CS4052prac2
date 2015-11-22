@@ -151,7 +151,6 @@ public class SimpleModelChecker implements ModelChecker {
     private boolean helper(Model model, PointOfExecution poe, FormulaPrime formulaPrime, boolean cont) throws QuantifierNotFoundException, OperatorNotSupportedException, NotValidException {
         boolean trueAtSomePoint = false;
 
-
         if (!(formulaPrime.isMostNestedCTL())) {
             for (int i = 0; i < 2; i++) {
                 FormulaElement fe = formulaPrime.getVals()[i];
@@ -184,7 +183,6 @@ public class SimpleModelChecker implements ModelChecker {
                                 return true;
                             }
                         }
-
                     }
                     if (cont) {
                         return false;
@@ -255,7 +253,6 @@ public class SimpleModelChecker implements ModelChecker {
 
         return trueAtSomePoint;
     }
-
 
     private boolean share(String[] one, String[] two) {
         if (one == null || two == null) {

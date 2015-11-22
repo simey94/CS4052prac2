@@ -8,12 +8,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
-/**
- * Created by davidwilson on 07/11/2015.
- */
-
-
-
 class NotValidException extends Exception
 {
 
