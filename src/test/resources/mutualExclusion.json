@@ -26,42 +26,42 @@
       "source": "nonCrit1nonCrit2",
       "target": "Crit1nonCrit2",
       "actions": [
-        "request"
+        "toCrit1"
       ]
     },
     {
       "source": "nonCrit1nonCrit2",
       "target": "nonCrit1Crit2",
       "actions": [
-        "request"
+        "toCrit2"
       ]
     },
     {
       "source": "Crit1nonCrit2",
       "target": "nonCrit1nonCrit2",
       "actions": [
-        "request"
+        "toNonCrit1AndNonCrit2FromCrit1AndNonCrit2"
       ]
     },
     {
       "source": "nonCrit1Crit2",
       "target": "nonCrit1nonCrit2",
       "actions": [
-        "request"
+        "toNonCrit2andNonCrit1FromNonCrit1AndCrit2"
       ]
     },
     {
       "source": "Crit1Crit2",
       "target": "nonCrit1Crit2",
       "actions": [
-        "request"
+        "toNonCrit1AndCrit2FromCrit1AndCrit2"
       ]
     },
     {
       "source": "Crit1Crit2",
       "target": "Crit1nonCrit2",
       "actions": [
-        "request"
+        "toNonCrit2FromCrit1AndCrit2"
       ]
     }
   ]
