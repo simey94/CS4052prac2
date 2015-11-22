@@ -40,27 +40,27 @@ public class SimpleModelChecker implements ModelChecker {
             e.printStackTrace();
         }
 
-        FormulaPrime formulaPrime = new FormulaPrime(formula);
-        try {
-            switch (formulaPrime.getQauntifier().charAt(0)) {
-                case ('E'):
-                    cont = true;
-                    break;
-                case ('A'):
-                    cont = false;
-                    break;
-                default:
-                    throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
-            }
-
-            return checkInitStates(model, formulaPrime, cont);
-        } catch (OperatorNotSupportedException e) {
-            e.printStackTrace();
-        } catch (QuantifierNotFoundException e) {
-            e.printStackTrace();
-        } catch (NotValidException e) {
-            globHistory = e.getExceptionHistory();
-        }
+//        FormulaPrime formulaPrime = new FormulaPrime(formula);
+//        try {
+//            switch (formulaPrime.getQauntifier().charAt(0)) {
+//                case ('E'):
+//                    cont = true;
+//                    break;
+//                case ('A'):
+//                    cont = false;
+//                    break;
+//                default:
+//                    throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
+//            }
+//
+//            return checkInitStates(model, formulaPrime, cont);
+//        } catch (OperatorNotSupportedException e) {
+//            e.printStackTrace();
+//        } catch (QuantifierNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (NotValidException e) {
+//            globHistory = e.getExceptionHistory();
+//        }
         return false;
     }
 
@@ -165,7 +165,10 @@ public class SimpleModelChecker implements ModelChecker {
                 }
             }
             return checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont);
-        } else switch (formulaPrime.getQauntifier().charAt(1)) {
+        }
+
+        char stateQuantifier = formulaPrime.getQauntifier().charAt(1);
+        switch (stateQuantifier) {
             case ('X'):
                 if (poe.getCurrentState().getLabelAsList().contains(formulaPrime.getVals()[0])) {
                     for (Transition t : poe.getFutureTransitions()) {
@@ -204,7 +207,6 @@ public class SimpleModelChecker implements ModelChecker {
                 } else {
                     if (traverse(model, formulaPrime, poe, cont))
                         trueAtSomePoint = true;
-
                 }
                 break;
             case ('F'):
@@ -244,7 +246,6 @@ public class SimpleModelChecker implements ModelChecker {
                 trueAtSomePoint = true;
             }
         }
-
 
         if (cont) {
             return trueAtSomePoint;

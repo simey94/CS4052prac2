@@ -11,6 +11,8 @@ public class PointOfExecution {
 
 
     public PointOfExecution(State currentState, PointOfExecution prev, Transition currentTransition, Model model) throws CycleException {
+        futureTransitions = new ArrayList<Transition>();
+
         this.currentState = currentState;
         if (prev != null) {
             ArrayList<State> temp = prev.getPreviousStates();
@@ -30,17 +32,15 @@ public class PointOfExecution {
         } else {
             previousTransitions = new ArrayList<Transition>();
             previousStates = new ArrayList<State>();
-            futureTransitions = new ArrayList<Transition>();
         }
         for (Transition t : model.getTransitions()) {
             if (t.getSource() == currentState.getName()) {
-                futureTransitions.add(t);
+                this.futureTransitions.add(t);
             }
 
         }
 
     }
-
 
     public ArrayList<Transition> getFutureTransitions() {
         return futureTransitions;
