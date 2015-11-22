@@ -85,7 +85,7 @@ public class SimpleModelChecker implements ModelChecker {
                     e.printStackTrace();
                     System.err.println("This should not occur");
                 }
-                if (!helper(model, next, formulaPrime)) {
+                if (!helper(model, next, formulaPrime, cont)) {
                     if (!cont) {
                         throw new NotValidException(next);
                     }
@@ -98,7 +98,7 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-    public boolean checkOperators(String operator, FormulaPrime formula, PointOfExecution poe, Model model) throws OperatorNotSupportedException, QuantifierNotFoundException, NotValidException {
+    public boolean checkOperators(String operator, FormulaPrime formula, PointOfExecution poe, Model model, boolean cont) throws OperatorNotSupportedException, QuantifierNotFoundException, NotValidException {
 
         FormulaElement[] vals = formula.getVals();
         switch (operator) {
@@ -118,7 +118,7 @@ public class SimpleModelChecker implements ModelChecker {
                     if (!poe.getCurrentState().containsLabel(formula.getVals()[0])) {
                         return false;
                     } else {
-                        traverse(model, formula, poe);
+                        traverse(model, formula, poe, cont);
                     }
                 } else if (share(poe.getLastTransition().getActions(), (formula.getActions()[1]))) {
                     return poe.getCurrentState().containsLabel(formula.getVals()[1]);
@@ -133,7 +133,7 @@ public class SimpleModelChecker implements ModelChecker {
 
     //    TODO deal with PATH QUANTIFIERS
 //    TODO Take in cont and work from there
-    private boolean helper(Model model, PointOfExecution poe, FormulaPrime formulaPrime) throws QuantifierNotFoundException, OperatorNotSupportedException, NotValidException {
+    private boolean helper(Model model, PointOfExecution poe, FormulaPrime formulaPrime, boolean cont) throws QuantifierNotFoundException, OperatorNotSupportedException, NotValidException {
         boolean trueAtSomePoint = false;
 
 
@@ -141,7 +141,7 @@ public class SimpleModelChecker implements ModelChecker {
             for (int i = 0; i < 2; i++) {
                 FormulaElement fe = formulaPrime.getVals()[i];
                 if (fe instanceof FormulaPrime) {
-                    boolean val = helper(model, poe, (FormulaPrime) fe);
+                    boolean val = helper(model, poe, (FormulaPrime) fe, cont);
                     if (!val) {
                         throw new NotValidException(poe);
                     } else {
@@ -149,7 +149,7 @@ public class SimpleModelChecker implements ModelChecker {
                     }
                 }
             }
-            return checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model);
+            return checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont);
         } else switch (formulaPrime.getQauntifier().charAt(1)) {
             case ('X'):
                 if (poe.getCurrentState().getLabelAsList().contains(formulaPrime.getVals()[0])) {
@@ -162,7 +162,7 @@ public class SimpleModelChecker implements ModelChecker {
                             continue;
                         }
                         if (share(formulaPrime.getActions()[1], t.getActions())) {
-                            if (checkOperators(formulaPrime.getOperator(), formulaPrime, next, model)) {
+                            if (checkOperators(formulaPrime.getOperator(), formulaPrime, next, model, cont)) {
                                 return true;
                             }
                         }
@@ -170,26 +170,26 @@ public class SimpleModelChecker implements ModelChecker {
                     }
                     return false;
                 } else {
-                    if (traverse(model, formulaPrime, poe))
+                    if (traverse(model, formulaPrime, poe, cont))
                         trueAtSomePoint = true;
                 }
 
                 break;
             case ('G'):
-                if (!share(formulaPrime.getActions()[1], (poe.getLastTransition()).getActions()) || (!checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model))) {
+                if (!share(formulaPrime.getActions()[1], (poe.getLastTransition()).getActions()) || (!checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont))) {
                     return false;
                 } else {
-                    if (traverse(model, formulaPrime, poe))
+                    if (traverse(model, formulaPrime, poe, cont))
                         trueAtSomePoint = true;
 
                 }
                 break;
             case ('F'):
                 if (share(formulaPrime.getActions()[1], (poe.getLastTransition()).getActions())) {
-                    if (checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model))
+                    if (checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont))
                         return true;
                 } else {
-                    if (traverse(model, formulaPrime, poe)) {
+                    if (traverse(model, formulaPrime, poe, cont)) {
                         trueAtSomePoint = true;
                     }
                 }
@@ -202,7 +202,7 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
 
-    private boolean traverse(Model model, FormulaPrime formulaPrime, PointOfExecution poe) throws QuantifierNotFoundException, OperatorNotSupportedException, NotValidException {
+    private boolean traverse(Model model, FormulaPrime formulaPrime, PointOfExecution poe, boolean cont) throws QuantifierNotFoundException, OperatorNotSupportedException, NotValidException {
         boolean trueAtSomePoint = false;
 
         for (Transition t : poe.getFutureTransitions()) {
@@ -213,7 +213,7 @@ public class SimpleModelChecker implements ModelChecker {
             } catch (CycleException e) {
                 return true; // if we have reached a cycle, return true
             }
-            if (helper(model, next, formulaPrime)) {
+            if (helper(model, next, formulaPrime, cont)) {
                 trueAtSomePoint = true;
             }
         }
