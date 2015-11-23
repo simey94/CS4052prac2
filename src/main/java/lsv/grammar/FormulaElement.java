@@ -14,4 +14,10 @@ public abstract class FormulaElement {
     public boolean getNegation() {
         return negation;
     }
+
+    /**
+     * Setter
+     * @param negation
+     */
+    public void setNegation(Boolean negation){ this.negation = negation; }
 }
