@@ -1,16 +1,16 @@
 package lsv.core;
 
 /**
- * Created by davidwilson on 12/11/2015.
+ * Exception class to handle erroneous quantifiers.
  */
 public class QuantifierNotFoundException extends Exception {
 
-
-    //Parameterless Constructor
+    /**
+     * Constructor
+     * @param quantifier
+     */
     public QuantifierNotFoundException(String quantifier) {
         super("Quantifier not found: " +quantifier);
-
-
     }
 
 }

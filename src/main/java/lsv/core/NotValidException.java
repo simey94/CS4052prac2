@@ -8,12 +8,19 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ * Exception class to handle when a path is not valid. Used to create the counter-example trace of model satisfiability.
+ */
 class NotValidException extends Exception
 {
 
     private ArrayList<Transition> transitions;
     private ArrayList<State> states;
 
+    /**
+     * Constructor to initalise a counter-example trace.
+     * @param poe
+     */
     public NotValidException(PointOfExecution poe) {
         transitions = new ArrayList<>();
         states = new ArrayList<>();
@@ -24,14 +31,26 @@ class NotValidException extends Exception
         }
     }
 
+    /**
+     * Getter for Transistions
+     * @return ArrayList of Transistions from current POE
+     */
     public ArrayList<Transition> getTransitions() {
         return transitions;
     }
 
+    /**
+     * Getter for States
+     * @return ArrayList of Transistions from current POE
+     */
     public ArrayList<State> getStates() {
         return states;
     }
 
+    /**
+     * Converts history to String so it can be returned in SimpleModelChecker.getTrace().
+     * @return ArrayList of Strings
+     */
     public ArrayList<String> getExceptionHistory() {
         ArrayList<String> temp = new ArrayList<String>();
         Queue<Transition> transitionsQueue = new LinkedList<>(transitions);

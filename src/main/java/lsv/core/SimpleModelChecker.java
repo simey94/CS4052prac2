@@ -4,22 +4,30 @@ import lsv.grammar.Formula;
 import lsv.grammar.FormulaElement;
 import lsv.grammar.FormulaPrime;
 import lsv.model.*;
-
 import java.util.ArrayList;
 
 public class SimpleModelChecker implements ModelChecker {
 
     private ArrayList<String> globHistory;
 
-
+    /**
+     * Performs verification of a model based on a formula and constraints. Calls checkInitStates to begin verification.
+     *
+     * @param model
+     * @param constraint
+     * @param formula
+     * @return true if the formula and constraint can be satisifed in the model. False otherwise.
+     */
     public boolean check(Model model, Formula constraint, Formula formula) {
         FormulaPrime constraintPrime = new FormulaPrime(constraint);
         boolean cont = false;
+
+        FormulaPrime constraintPrime = new FormulaPrime(constraint);
+        boolean cont;
         while (true) {
             Model copy = new Model(model);
             try {
                 String temp = constraintPrime.getQauntifier();
-
 
                 if (temp != null) {
                     switch (temp.charAt(0)) {
@@ -34,6 +42,17 @@ public class SimpleModelChecker implements ModelChecker {
                     }
                 }
                 checkInitStates(model, constraintPrime, cont);
+                switch (temp.charAt(0)) {
+                    case ('E'):
+                        cont = true;
+                        break;
+                    case ('A'):
+                        cont = false;
+                        break;
+                    default:
+                        throw new QuantifierNotFoundException(constraintPrime.getQauntifier());
+                }
+                return checkInitStates(model, constraintPrime, cont);
             } catch (NotValidException e) {
                 model.removeFromModel(e.getStates(), e.getTransitions());
                 if (copy.equals(model)) {
@@ -71,15 +90,30 @@ public class SimpleModelChecker implements ModelChecker {
         return false;
     }
 
+    /**
+     * Returns a counter-example trace of an unsatisfiable path.
+     * @return String[] of the transistions
+     */
     public String[] getTrace() {
         return globHistory.toArray(new String[globHistory.size()]);
     }
 
-
+    /**
+     * Sets current POE to an init state. Calls helper to begin model checking process from this POE.
+     *
+     * @param model
+     * @param formulaPrime
+     * @param cont
+     * @return True if path is verified. False if path is not valid.
+     * @throws NotValidException
+     * @throws QuantifierNotFoundException
+     * @throws OperatorNotSupportedException
+     */
     private boolean checkInitStates(Model model, FormulaPrime formulaPrime, boolean cont) throws NotValidException, QuantifierNotFoundException, OperatorNotSupportedException {
 
         PointOfExecution next = null;
         boolean trueAtSomePoint = false;
+        ArrayList<Transition> transitions = new ArrayList<>(Arrays.asList(model.getTransitions()));
 
         for (State state : model.getStates()) {
             if (state.isInit()) {
@@ -109,7 +143,18 @@ public class SimpleModelChecker implements ModelChecker {
         return trueAtSomePoint;
     }
 
-
+    /**
+     * Conducts all comparisons on a per operator basis at the current point of execution.
+     * @param operator
+     * @param formula
+     * @param poe
+     * @param model
+     * @param cont
+     * @return True if the boolean relation evaluates to true. False if the relation evaluates to false.
+     * @throws OperatorNotSupportedException
+     * @throws QuantifierNotFoundException
+     * @throws NotValidException
+     */
     public boolean checkOperators(String operator, FormulaPrime formula, PointOfExecution poe, Model model, boolean cont) throws OperatorNotSupportedException, QuantifierNotFoundException, NotValidException {
 
         boolean temp = false;
@@ -172,6 +217,17 @@ public class SimpleModelChecker implements ModelChecker {
         return true;
     }
 
+    /**
+     *
+     * @param model
+     * @param poe
+     * @param formulaPrime
+     * @param cont
+     * @return
+     * @throws QuantifierNotFoundException
+     * @throws OperatorNotSupportedException
+     * @throws NotValidException
+     */
     private boolean helper(Model model, PointOfExecution poe, FormulaPrime formulaPrime, boolean cont) throws QuantifierNotFoundException, OperatorNotSupportedException, NotValidException {
         boolean trueAtSomePoint = false;
         if (!(formulaPrime.isMostNestedCTL())) {
@@ -272,7 +328,6 @@ public class SimpleModelChecker implements ModelChecker {
                     }
                 }
                 break;
-
             default: // could just be A or E
                 last = poe.getLastTransition();
                 if (last == null) { // means this is an initial transition
@@ -284,7 +339,6 @@ public class SimpleModelChecker implements ModelChecker {
         }
         return trueAtSomePoint;
     }
-
 
     private boolean traverse(Model model, FormulaPrime formulaPrime, PointOfExecution poe, boolean cont) throws QuantifierNotFoundException, OperatorNotSupportedException, NotValidException {
         boolean trueAtSomePoint = false;
@@ -310,7 +364,6 @@ public class SimpleModelChecker implements ModelChecker {
         return trueAtSomePoint;
     }
 
-
     private boolean share(String[] one, String[] two) {
         if (one == null || two == null) {
             return false;
@@ -323,8 +376,6 @@ public class SimpleModelChecker implements ModelChecker {
         }
         return false;
     }
-
-
 }
 
 
