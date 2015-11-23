@@ -32,7 +32,7 @@ public class ModelCheckerTest {
         ModelChecker mc = new SimpleModelChecker();
 //        Test mutual Exclusion
         Formula trueConstraint = Builder.buildFormula("src/test/resources/true.json");
-        Model mutualExclusionModel = Builder.buildModel("src/test/resources/mutualExclusion2.json");
+        Model mutualExclusionModel = Builder.buildModel("src/test/resources/mutualExclusion.json");
         Formula mutualExclusionFormula = Builder.buildFormula("src/test/resources/mutualExclusionFormula.json");
         assertTrue(mc.check(mutualExclusionModel, trueConstraint, mutualExclusionFormula));
 
@@ -46,7 +46,7 @@ public class ModelCheckerTest {
         ModelChecker mc = new SimpleModelChecker();
         Formula trueConstraint = Builder.buildFormula("src/test/resources/true.json");
         trueConstraint.setNegation(true);
-        Model mutualExclusionModel = Builder.buildModel("src/test/resources/mutualExclusion2.json");
+        Model mutualExclusionModel = Builder.buildModel("src/test/resources/mutualExclusion.json");
         Formula mutualExclusionFormula = Builder.buildFormula("src/test/resources/mutualExclusionFormula.json");
         assertTrue(!(mc.check(mutualExclusionModel, trueConstraint, mutualExclusionFormula)));
     }
