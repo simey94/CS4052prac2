@@ -48,7 +48,7 @@ public class ModelCheckerTest {
     public void ourModelTest(){
 
     Model model = Builder.buildModel("src/test/resources/ourModel.json");
-    Formula fairnessConstraint = Builder.buildFormula("src/test/resources/modelFormula.json");
+    Formula fairnessConstraint = Builder.buildFormula("src/test/resources/modelConstraint.json");
     Formula query = Builder.buildFormula("src/test/resources/modelFormula.json");
     ModelChecker mc = new SimpleModelChecker();
 
