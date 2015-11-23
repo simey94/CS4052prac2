@@ -44,6 +44,16 @@ public class ModelCheckerTest {
     }
 
 
-//    @Test
-//    public void test
+    @Test
+    public void ourModelTest(){
+
+    Model model = Builder.buildModel("src/test/resources/ourModel.json");
+
+    Formula fairnessConstraint = Builder.buildFormula("src/test/resources/mutualExclusionFormula.json");
+
+    Formula query = Builder.buildFormula("src/test/resources/model2Formula.json");
+
+    ModelChecker mc = new SimpleModelChecker();
+    }
+
 }
