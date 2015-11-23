@@ -2,6 +2,7 @@ package lsv.core;
 
 import lsv.grammar.Formula;
 import lsv.model.Model;
+import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertTrue;
@@ -24,7 +25,6 @@ public class ModelCheckerTest {
 
 	ModelChecker mc = new SimpleModelChecker();
     assertTrue(mc.check(model, query, query));
-
     }
 
     @Test
@@ -49,6 +49,16 @@ public class ModelCheckerTest {
         Model mutualExclusionModel = Builder.buildModel("src/test/resources/mutualExclusion2.json");
         Formula mutualExclusionFormula = Builder.buildFormula("src/test/resources/mutualExclusionFormula.json");
         assertTrue(!(mc.check(mutualExclusionModel, trueConstraint, mutualExclusionFormula)));
+    }
+
+
+    @Test
+    public void testFinally() throws RecognitionException {
+        ModelChecker mc = new SimpleModelChecker();
+        Formula trueConstraint = Builder.buildFormula("src/test/resources/true.json");
+        Model mutualExclusionModel = Builder.buildModel("src/test/resources/ourModel2.json");
+        Formula f = Builder.buildFormula("src/test/resources/checkfinally.json");
+        assertTrue((mc.check(mutualExclusionModel, trueConstraint, f)));
     }
 
     @Test

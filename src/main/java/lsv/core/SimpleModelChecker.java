@@ -61,7 +61,7 @@ public class SimpleModelChecker implements ModelChecker {
 
         FormulaPrime formulaPrime = new FormulaPrime(formula);
         try {
-            String temp = constraintPrime.getQauntifier();
+            String temp = formulaPrime.getQauntifier();
 
             if (temp != null) {
                 switch (temp.charAt(0)) {
