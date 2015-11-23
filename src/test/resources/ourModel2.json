@@ -21,14 +21,9 @@
       "label": ["y"]
     },
     {
-      "init": false,
+      "init": true,
       "name": "s4",
       "label": ["d"]
-    },
-    {
-      "init": false,
-      "name": "s5",
-      "label": ["b"]
     }
   ],
   "transitions": [
@@ -48,30 +43,44 @@
     },
     {
       "source": "s2",
-      "target": "s3",
+      "target": "s1",
       "actions": [
         "act3"
+      ]
+    },
+    {
+      "source": "s2",
+      "target": "s3",
+      "actions": [
+        "act5"
+      ]
+    },
+    {
+      "source": "s0",
+      "target": "s3",
+      "actions": [
+        "act4"
       ]
     },
     {
       "source": "s3",
       "target": "s4",
       "actions": [
-        "act4"
+        "act6"
       ]
     },
     {
       "source": "s4",
-      "target": "s5",
+      "target": "s2",
       "actions": [
-        "act5"
+        "act7"
       ]
     },
     {
-      "source": "s5",
-      "target": "s0",
+      "source": "s4",
+      "target": "s3",
       "actions": [
-        "act6"
+        "act8"
       ]
     }
   ]
