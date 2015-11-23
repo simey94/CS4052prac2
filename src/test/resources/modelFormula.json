@@ -1,4 +1,5 @@
 {
-  "formula": "AGb( !c || !d )",
-  "b": ["act1"]
+  "formula": "AaXb(True)",
+  "a": ["act1"],
+  "b": ["act2"]
 }
