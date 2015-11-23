@@ -48,12 +48,12 @@ public class ModelCheckerTest {
     public void ourModelTest(){
 
     Model model = Builder.buildModel("src/test/resources/ourModel.json");
-
-    Formula fairnessConstraint = Builder.buildFormula("src/test/resources/mutualExclusionFormula.json");
-
+    Formula fairnessConstraint = Builder.buildFormula("src/test/resources/model2Formula.json");
     Formula query = Builder.buildFormula("src/test/resources/model2Formula.json");
-
     ModelChecker mc = new SimpleModelChecker();
+
+    assertTrue(!(mc.check(model, fairnessConstraint, query)));
+
     }
 
 }
