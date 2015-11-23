@@ -377,11 +377,6 @@ public class SimpleModelChecker implements ModelChecker {
             }
         }
 
-        if (cont) {
-            return trueAtSomePoint;
-        } else if (!trueAtSomePoint) {
-            throw new NotValidException(poe);
-        }
         return trueAtSomePoint;
     }
 
