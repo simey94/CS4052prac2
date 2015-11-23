@@ -20,8 +20,7 @@ public class  Transition {
 
         if (source != null ? !source.equals(that.source) : that.source != null) return false;
         if (target != null ? !target.equals(that.target) : that.target != null) return false;
-        // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        return Arrays.equals(actions, that.actions);
+        return Arrays.deepEquals(actions, that.actions);
 
     }
 

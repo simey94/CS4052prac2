@@ -9,7 +9,18 @@ import java.util.Arrays;
 public class Model {
     State [] states;
     Transition [] transitions;
-		
+
+
+
+    public Model(State [] states,Transition [] transitions) {
+        this.states = states;
+        this.transitions = transitions;
+    }
+
+    public Model(Model m) {
+        this.states = m.getStates();
+        this.transitions = m.getTransitions();
+    }
     /**
      * Returns the list of the states
      * @return list of state for the given model
@@ -54,6 +65,19 @@ public class Model {
         if (tempTransitions != null) {
             transitions = tempTransitions.toArray(new Transition[tempTransitions.size()]);
         }
+    }
+
+
+    public boolean equals(Model model) {
+        for (int i=0; i<states.length; i++ ) {
+            if (!(states[i].equals(model.getStates()[i]))) return false;
+        }
+        for (int i=0; i<transitions.length; i++ ) {
+            if (!(transitions[i].equals(model.getStates()[i]))) return false;
+        }
+
+        return false;
+
     }
 }
 

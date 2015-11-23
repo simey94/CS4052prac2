@@ -19,26 +19,32 @@ public class SimpleModelChecker implements ModelChecker {
 
         FormulaPrime constraintPrime = new FormulaPrime(constraint);
         boolean cont;
-//        try {
-//            String temp = constraintPrime.getQauntifier();
-//            switch (temp.charAt(0)) {
-//                case ('E'):
-//                    cont = true;
-//                    break;
-//                case ('A'):
-//                    cont = false;
-//                    break;
-//                default:
-//                    throw new QuantifierNotFoundException(constraintPrime.getQauntifier());
-//            }
-//            return checkInitStates(model, constraintPrime, cont);
-//        } catch (NotValidException e) {
-//            model.removeFromModel(e.getStates(), e.getTransitions());
-//        } catch (OperatorNotSupportedException e) {
-//            e.printStackTrace();
-//        } catch (QuantifierNotFoundException e) {
-//            e.printStackTrace();
-//        }
+        while(true) {
+            Model copy = new Model(model);
+        try {
+            String temp = constraintPrime.getQauntifier();
+            switch (temp.charAt(0)) {
+                case ('E'):
+                    cont = true;
+                    break;
+                case ('A'):
+                    cont = false;
+                    break;
+                default:
+                    throw new QuantifierNotFoundException(constraintPrime.getQauntifier());
+            }
+            return checkInitStates(model, constraintPrime, cont);
+        } catch (NotValidException e) {
+            model.removeFromModel(e.getStates(), e.getTransitions());
+            if (copy.equals(model)) {
+                break;
+            }
+        } catch (OperatorNotSupportedException e) {
+            e.printStackTrace();
+        } catch (QuantifierNotFoundException e) {
+            e.printStackTrace();
+        }
+        }
 
         FormulaPrime formulaPrime = new FormulaPrime(formula);
         try {
@@ -137,7 +143,13 @@ public class SimpleModelChecker implements ModelChecker {
                         traverse(model, formula, poe, cont);
                     }
                 } else if (share(poe.getLastTransition().getActions(), (formula.getActions()[1]))) {
-                    temp = poe.getCurrentState().isTrue(vals[1]);
+//                    temp = poe.getCurrentState().isTrue(vals[1]);
+                    if  (vals[1] != null) {
+                        temp = poe.getCurrentState().isTrue(vals[1]);
+                    }
+                    else {
+                        temp = true;
+                    }
                 }
                 break;
             default:
