@@ -179,18 +179,18 @@ public class SimpleModelChecker implements ModelChecker {
             case ("<=>"):
                 temp = ((!poe.getCurrentState().isTrue(vals[0]) && !poe.getCurrentState().isTrue(vals[1])) || (poe.getCurrentState().isTrue(vals[0]) && poe.getCurrentState().isTrue(vals[1])));
             case ("U"):
-                if (share(poe.getLastTransition().getActions(), (formula.getActions()[0]))) {
-                    if (!poe.getCurrentState().isTrue(vals[0])) {
+                if (share(poe.getLastTransition().getActions(), (formula.getActions()[0]))) { //if current action is action before the U
+                    if (!poe.getCurrentState().isTrue(vals[0])) {  // if the value that is before the U is not current
                         if (cont) {
                             return temp;
                         } else if (!temp) {
                             throw new NotValidException(poe);
                         }
-                    } else {
+                    } else { // if the value that is before the U is current value for state
                         traverse(model, formula, poe, cont);
                     }
-                } else if (share(poe.getLastTransition().getActions(), (formula.getActions()[1]))) {
-                    if (vals[1] != null) {
+                } else if (share(poe.getLastTransition().getActions(), (formula.getActions()[1]))) { //if actions are action after the U
+                    if (vals[1] != null) { // if there is value after U, check this is correct
                         temp = poe.getCurrentState().isTrue(vals[1]);
                     } else {
                         temp = true;
