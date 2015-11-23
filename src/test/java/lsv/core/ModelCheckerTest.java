@@ -20,7 +20,7 @@ public class ModelCheckerTest {
 
 	Model model = Builder.buildModel("src/test/resources/model.json");
 
-	Formula fairnessConstraint = Builder.buildFormula("src/test/resources/constraint1.json");
+	Formula fairnessConstraint = Builder.buildFormula("src/test/resources/mutualExclusionFormula.json");
 
 	Formula query = Builder.buildFormula("src/test/resources/ctl.json");
 	
@@ -28,6 +28,7 @@ public class ModelCheckerTest {
 
 	// TO IMPLEMENT
         assertTrue(mc.check(model, fairnessConstraint, query));
+
     }
 
 }

@@ -4,6 +4,7 @@ import lsv.grammar.Formula;
 import lsv.grammar.FormulaElement;
 import lsv.grammar.FormulaPrime;
 import lsv.model.*;
+
 import java.util.ArrayList;
 
 /**
@@ -93,6 +94,7 @@ public class SimpleModelChecker implements ModelChecker {
 
     /**
      * Returns a counter-example trace of an unsatisfiable path.
+     *
      * @return String[] of the transistions
      */
     public String[] getTrace() {
@@ -145,6 +147,7 @@ public class SimpleModelChecker implements ModelChecker {
 
     /**
      * Conducts all comparisons on a per operator basis at the current point of execution.
+     *
      * @param operator
      * @param formula
      * @param poe
@@ -218,7 +221,6 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
     /**
-     *
      * @param model
      * @param poe
      * @param formulaPrime
@@ -235,6 +237,10 @@ public class SimpleModelChecker implements ModelChecker {
                 FormulaElement fe = formulaPrime.getVals()[i];
                 if (fe instanceof FormulaPrime) {
                     boolean val = helper(model, poe, (FormulaPrime) fe, cont);
+
+                    if (((FormulaPrime) fe).isNegation()) {
+                        val = !val;
+                    }
                     if (!val) {
                         throw new NotValidException(poe);
                     } else {
@@ -242,106 +248,117 @@ public class SimpleModelChecker implements ModelChecker {
                     }
                 }
             }
-            return checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont);
+            trueAtSomePoint = checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont);
         }
+        else {
 
-        char stateQuantifier = 0;
-        String qauntifier = formulaPrime.getQauntifier();
-        if (qauntifier == null) {
-            stateQuantifier = 0;
-        } else if (qauntifier.length() > 1) {
-            stateQuantifier = formulaPrime.getQauntifier().charAt(1);
-        }
-        switch (stateQuantifier) {
-            case ('X'):
-                Transition last = poe.getLastTransition();
-                if (last == null) { // means this is an initial transition
-                    return traverse(model, formulaPrime, poe, cont);
-                } else if (share(formulaPrime.getActions()[1], (poe.getLastTransition()).getActions())) {
-                    for (Transition t : poe.getFutureTransitions()) {
-                        State nextState = model.getStateFromName(t.getTarget());
-                        PointOfExecution next;
-                        try {
-                            next = new PointOfExecution(nextState, poe, t, model);
-                        } catch (CycleException e) {
-                            continue;
+            char stateQuantifier = 0;
+            String qauntifier = formulaPrime.getQauntifier();
+            if (qauntifier == null) {
+                stateQuantifier = 0;
+            } else if (qauntifier.length() > 1) {
+                stateQuantifier = formulaPrime.getQauntifier().charAt(1);
+            }
+            switch (stateQuantifier) {
+                case ('X'):
+                    Transition last = poe.getLastTransition();
+                    if (last == null) { // means this is an initial transition
+                        return traverse(model, formulaPrime, poe, cont);
+                    } else if (share(formulaPrime.getActions()[1], (poe.getLastTransition()).getActions())) {
+                        for (Transition t : poe.getFutureTransitions()) {
+                            State nextState = model.getStateFromName(t.getTarget());
+                            PointOfExecution next;
+                            try {
+                                next = new PointOfExecution(nextState, poe, t, model);
+                            } catch (CycleException e) {
+                                continue;
+                            }
+                            if (share(formulaPrime.getActions()[1], t.getActions())) {
+                                if (checkOperators(formulaPrime.getOperator(), formulaPrime, next, model, cont)) {
+                                    trueAtSomePoint = traverse(model, formulaPrime, next, cont);
+                                }
+                            }
+
                         }
-                        if (share(formulaPrime.getActions()[1], t.getActions())) {
-                            if (checkOperators(formulaPrime.getOperator(), formulaPrime, next, model, cont)) {
-                                trueAtSomePoint = traverse(model, formulaPrime, next, cont);
+
+                        trueAtSomePoint ^= formulaPrime.isNegation();
+                        if (trueAtSomePoint) {
+                            return trueAtSomePoint;
+                        } else if (cont) {
+                            return trueAtSomePoint;
+                        } else {
+                            throw new NotValidException(poe);
+                        }
+                    } else {
+                        if (cont) { //means this hasn't occurred at this point, but will occur at some point.
+                            return (false ^ formulaPrime.isNegation());
+                        } else { // means this hasn't occurred - so return error
+                            throw new NotValidException(poe);
+                        }
+                    }
+                case ('G'):
+                    last = poe.getLastTransition();
+                    if (last == null) {
+                        traverse(model, formulaPrime, poe, cont);
+                    }
+                    if (share(formulaPrime.getActions()[1], (poe.getLastTransition()).getActions())) {
+                        if (!checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont)) {
+                            if (!formulaPrime.isNegation()) {
+                                if (cont) {
+                                    return false;
+                                } else {
+                                    throw new NotValidException(poe);
+                                }
                             }
                         }
+                        if (traverse(model, formulaPrime, poe, cont))
+                            trueAtSomePoint = true;
 
-                    }
-
-                    if (trueAtSomePoint) {
-                        return true;
-                    } else {
+                    } else if (!formulaPrime.isNegation()) {
                         if (cont) {
                             return false;
                         } else {
                             throw new NotValidException(poe);
                         }
-                    }
-                } else {
-                    if (cont) { //means this hasn't occurred at this point, but will occur at some point.
-                        return false;
-                    } else { // means this hasn't occurred - so return error
-                        throw new NotValidException(poe);
-                    }
-                }
-            case ('G'):
-                last = poe.getLastTransition();
-                if (last == null) {
-                    traverse(model, formulaPrime, poe, cont);
-                }
-                if (share(formulaPrime.getActions()[1], (poe.getLastTransition()).getActions())) {
-                    if (!checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont)) {
-                        return false;
-                    }
-                    if (cont) {
-                        return false;
                     } else {
-                        throw new NotValidException(poe);
+                        if (traverse(model, formulaPrime, poe, cont))
+                            trueAtSomePoint = true;
                     }
-                } else {
-                    if (traverse(model, formulaPrime, poe, cont))
-                        trueAtSomePoint = true;
-                }
-                break;
-            case ('F'):
-                last = poe.getLastTransition();
-                if (last == null) {
-                    traverse(model, formulaPrime, poe, cont);
-                } else if (share(formulaPrime.getActionsAt(1), (last.getActions()))) { // if Fb , b has tow occurred
-                    return checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont);
-                } else { // if AaFb, check a has occured
-                    if (formulaPrime.getActionsAt(0) != null) { // if AaFb, check that something is at a position
-                        if (!cont) { //check if A
-                            if (!share(formulaPrime.getActionsAt(0), (last.getActions()))) {
-                                throw new NotValidException(poe);
+                    break;
+                case ('F'):
+                    last = poe.getLastTransition();
+                    if (last == null) {
+                        traverse(model, formulaPrime, poe, cont);
+                    } else if (share(formulaPrime.getActionsAt(1), (last.getActions()))) { // if Fb , b has tow occurred
+                        return (checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont) ^ formulaPrime.isNegation());
+                    } else { // if AaFb, check a has occured
+                        if (formulaPrime.getActionsAt(0) != null) { // if AaFb, check that something is at a position
+                            if (!cont) { //check if A
+                                if (!share(formulaPrime.getActionsAt(0), (last.getActions()))) {
+                                    throw new NotValidException(poe);
+                                }
                             }
                         }
+                        if (traverse(model, formulaPrime, poe, cont)) {
+                            trueAtSomePoint = true;
+                        }
                     }
-                    if (traverse(model, formulaPrime, poe, cont)) {
-                        trueAtSomePoint = true;
+                    break;
+                default: // could just be A or E
+                    last = poe.getLastTransition();
+                    if (last == null) { // means this is an initial transition
+                        return traverse(model, formulaPrime, poe, cont);
+                    } else {
+                        boolean check = checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont);
+                        return (formulaPrime.isNegation() ^ check);
                     }
-                }
-                break;
-            default: // could just be A or E
-                last = poe.getLastTransition();
-                if (last == null) { // means this is an initial transition
-                    return traverse(model, formulaPrime, poe, cont);
-                } else {
-                    boolean check = checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont);
-                    return check;
-                }
+            }
         }
-        return trueAtSomePoint;
+
+        return (trueAtSomePoint^ formulaPrime.isNegation());
     }
 
     /**
-     *
      * @param model
      * @param formulaPrime
      * @param poe
@@ -377,6 +394,7 @@ public class SimpleModelChecker implements ModelChecker {
 
     /**
      * Checks whether two arrays contain the same element.
+     *
      * @param one
      * @param two
      * @return True if the two arrays share an element. False if they do not.
