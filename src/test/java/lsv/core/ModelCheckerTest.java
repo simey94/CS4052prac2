@@ -52,24 +52,5 @@ public class ModelCheckerTest {
     }
 
 
-    @Test
-    public void testFinally() throws RecognitionException {
-        ModelChecker mc = new SimpleModelChecker();
-        Formula trueConstraint = Builder.buildFormula("src/test/resources/true.json");
-        Model mutualExclusionModel = Builder.buildModel("src/test/resources/ourModel2.json");
-        Formula f = Builder.buildFormula("src/test/resources/checkfinally.json");
-        assertTrue((mc.check(mutualExclusionModel, trueConstraint, f)));
-    }
-
-    @Test
-    public void ourModelTest(){
-    Model ourModel = Builder.buildModel("src/test/resources/ourModel.json");
-    Formula trueConstraint = Builder.buildFormula("src/test/resources/modelConstraint.json");
-    Formula query = Builder.buildFormula("src/test/resources/modelFormula.json");
-    ModelChecker mc = new SimpleModelChecker();
-
-    assertTrue(mc.check(ourModel, trueConstraint, query));
-
-    }
 
 }
