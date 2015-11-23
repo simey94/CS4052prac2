@@ -6,10 +6,6 @@ import lsv.grammar.FormulaPrime;
 import lsv.model.*;
 import java.util.ArrayList;
 
-/**
- * Class to implement asCTL model checking.
- */
-
 public class SimpleModelChecker implements ModelChecker {
 
     private ArrayList<String> globHistory;
@@ -23,12 +19,20 @@ public class SimpleModelChecker implements ModelChecker {
      * @return true if the formula and constraint can be satisifed in the model. False otherwise.
      */
     public boolean check(Model model, Formula constraint, Formula formula) {
+<<<<<<< Updated upstream
         FormulaPrime constraintPrime = new FormulaPrime(constraint);
         boolean cont = false;
+=======
+
+        FormulaPrime constraintPrime = new FormulaPrime(constraint);
+        boolean cont;
+>>>>>>> Stashed changes
         while (true) {
             Model copy = new Model(model);
             try {
                 String temp = constraintPrime.getQauntifier();
+<<<<<<< Updated upstream
+
 
                 if (temp != null) {
                     switch (temp.charAt(0)) {
@@ -43,6 +47,7 @@ public class SimpleModelChecker implements ModelChecker {
                     }
                 }
                 checkInitStates(model, constraintPrime, cont);
+=======
                 switch (temp.charAt(0)) {
                     case ('E'):
                         cont = true;
@@ -54,6 +59,7 @@ public class SimpleModelChecker implements ModelChecker {
                         throw new QuantifierNotFoundException(constraintPrime.getQauntifier());
                 }
                 return checkInitStates(model, constraintPrime, cont);
+>>>>>>> Stashed changes
             } catch (NotValidException e) {
                 model.removeFromModel(e.getStates(), e.getTransitions());
                 if (copy.equals(model)) {
@@ -114,6 +120,10 @@ public class SimpleModelChecker implements ModelChecker {
 
         PointOfExecution next = null;
         boolean trueAtSomePoint = false;
+<<<<<<< Updated upstream
+=======
+        ArrayList<Transition> transitions = new ArrayList<>(Arrays.asList(model.getTransitions()));
+>>>>>>> Stashed changes
 
         for (State state : model.getStates()) {
             if (state.isInit()) {
@@ -179,18 +189,18 @@ public class SimpleModelChecker implements ModelChecker {
             case ("<=>"):
                 temp = ((!poe.getCurrentState().isTrue(vals[0]) && !poe.getCurrentState().isTrue(vals[1])) || (poe.getCurrentState().isTrue(vals[0]) && poe.getCurrentState().isTrue(vals[1])));
             case ("U"):
-                if (share(poe.getLastTransition().getActions(), (formula.getActions()[0]))) { //if current action is action before the U
-                    if (!poe.getCurrentState().isTrue(vals[0])) {  // if the value that is before the U is not current
+                if (share(poe.getLastTransition().getActions(), (formula.getActions()[0]))) {
+                    if (!poe.getCurrentState().isTrue(vals[0])) {
                         if (cont) {
                             return temp;
                         } else if (!temp) {
                             throw new NotValidException(poe);
                         }
-                    } else { // if the value that is before the U is current value for state
+                    } else {
                         traverse(model, formula, poe, cont);
                     }
-                } else if (share(poe.getLastTransition().getActions(), (formula.getActions()[1]))) { //if actions are action after the U
-                    if (vals[1] != null) { // if there is value after U, check this is correct
+                } else if (share(poe.getLastTransition().getActions(), (formula.getActions()[1]))) {
+                    if (vals[1] != null) {
                         temp = poe.getCurrentState().isTrue(vals[1]);
                     } else {
                         temp = true;
@@ -223,7 +233,7 @@ public class SimpleModelChecker implements ModelChecker {
      * @param poe
      * @param formulaPrime
      * @param cont
-     * @return True if formula is satisfiable in the path. False if formula is invalid in the path.
+     * @return
      * @throws QuantifierNotFoundException
      * @throws OperatorNotSupportedException
      * @throws NotValidException
@@ -284,9 +294,9 @@ public class SimpleModelChecker implements ModelChecker {
                         }
                     }
                 } else {
-                    if (cont) { //means this hasn't occurred at this point, but will occur at some point.
+                    if (cont) { //means this hasn't occured at this point, but will occur at some point.
                         return false;
-                    } else { // means this hasn't occurred - so return error
+                    } else { // means this hasn't occured - so return erro
                         throw new NotValidException(poe);
                     }
                 }
@@ -340,17 +350,6 @@ public class SimpleModelChecker implements ModelChecker {
         return trueAtSomePoint;
     }
 
-    /**
-     *
-     * @param model
-     * @param formulaPrime
-     * @param poe
-     * @param cont
-     * @return
-     * @throws QuantifierNotFoundException
-     * @throws OperatorNotSupportedException
-     * @throws NotValidException
-     */
     private boolean traverse(Model model, FormulaPrime formulaPrime, PointOfExecution poe, boolean cont) throws QuantifierNotFoundException, OperatorNotSupportedException, NotValidException {
         boolean trueAtSomePoint = false;
 
@@ -375,12 +374,6 @@ public class SimpleModelChecker implements ModelChecker {
         return trueAtSomePoint;
     }
 
-    /**
-     * Checks whether two arrays contain the same element.
-     * @param one
-     * @param two
-     * @return True if the two arrays share an element. False if they do not.
-     */
     private boolean share(String[] one, String[] two) {
         if (one == null || two == null) {
             return false;

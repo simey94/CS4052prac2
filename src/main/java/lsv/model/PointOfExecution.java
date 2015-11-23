@@ -2,6 +2,10 @@ package lsv.model;
 
 import java.util.ArrayList;
 
+/**
+ * Class to represent the current point of execution whilst conducting Model verification.
+ */
+
 public class PointOfExecution {
 
     private State currentState;
@@ -10,6 +14,15 @@ public class PointOfExecution {
     private ArrayList<Transition> futureTransitions = new ArrayList<Transition>();
 
 
+    /**
+     * Constructor to generate the current point of execution.
+     *
+     * @param currentState
+     * @param prev
+     * @param currentTransition
+     * @param model
+     * @throws CycleException
+     */
     public PointOfExecution(State currentState, PointOfExecution prev, Transition currentTransition, Model model) throws CycleException {
 
         this.currentState = currentState;
@@ -18,7 +31,7 @@ public class PointOfExecution {
             temp.add(prev.getCurrentState()); // add previous state to the list of states it had
             previousStates = temp;
 
-            //        check for cycle
+            // check for cycle
             if (previousStates.contains(currentState)) {
                 throw new CycleException();
             }
@@ -41,22 +54,44 @@ public class PointOfExecution {
 
     }
 
+    /**
+     * Getter
+     * @return ArrayList of type Transition representing the transitions available from current state that have not been used before.
+     */
+
     public ArrayList<Transition> getFutureTransitions() {
         return futureTransitions;
     }
+
+    /**
+     * Getter
+     * @return ArrayList of type State that model checker has encounter previously.
+     */
 
     public ArrayList<State> getPreviousStates() {
         return previousStates;
     }
 
+    /**
+     * Getter
+     * @return State object Model is currently in.
+     */
     public State getCurrentState() {
         return currentState;
     }
 
+    /**
+     * Getter
+     * @return ArrayList of type Transition representing the transitions the model has previously used.
+     */
     public ArrayList<Transition> getPreviousTransitions() {
         return previousTransitions;
     }
 
+    /**
+     * Getter
+     * @return Last Transition the Model Checker conducted.
+     */
     public Transition getLastTransition() {
         if (!previousTransitions.isEmpty()) {
             return previousTransitions.get(previousTransitions.size() - 1);

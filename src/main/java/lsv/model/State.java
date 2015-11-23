@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- *
- * */
+ * Class to represent the states of a Model to be verified.
+ */
+
 public class State {
+
     private boolean init;
     private String name;
     private String[] label;
@@ -40,6 +42,7 @@ public class State {
      *
      * @return boolean init
      */
+
     public boolean isInit() {
         return init;
     }
@@ -49,6 +52,7 @@ public class State {
      *
      * @return String name
      */
+
     public String getName() {
         return name;
     }
@@ -58,16 +62,26 @@ public class State {
      *
      * @return Array of string labels
      */
+
     public String[] getLabel() {
         return label;
     }
 
 
+    /**
+     * Get labels of state in list format.
+     * @return ArrayList of type String representing the labels of the state.
+     */
     public ArrayList<String> getLabelAsList() {
         return new ArrayList<>(Arrays.asList(label));
     }
 
 
+    /**
+     * Checks whether the state contains a given label.
+     * @param val
+     * @return True if the state contains the label val. False if it does not contain the label.
+     */
     public Boolean containsLabel(Object val) {
         ArrayList<String> labels = getLabelAsList();
         if (!(val instanceof String)) {
@@ -77,6 +91,11 @@ public class State {
 
     }
 
+    /**
+     * Checks whether an element of a formula is true and recursively evaluates it if it is not.
+     * @param formulaElement
+     * @return True if the formulaElement evaluates to True. False if formulaElement evaluates to false.
+     */
     public boolean isTrue(FormulaElement formulaElement) {
         // if instance of ap check if array list contains that
         if (formulaElement instanceof AtomicProp) {
@@ -92,7 +111,6 @@ public class State {
         }
 
         // if nestedCTL recursively eval
-
         return false;
     }
 

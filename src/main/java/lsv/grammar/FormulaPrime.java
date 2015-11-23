@@ -3,6 +3,7 @@ package lsv.grammar;
 /**
  * A more OOP approach to the supplied Formula class.
  */
+
 public class FormulaPrime extends FormulaElement {
 
     private FormulaElement[] vals = new FormulaElement[2];
@@ -63,29 +64,65 @@ public class FormulaPrime extends FormulaElement {
         }
     }
 
+    /**
+     * Getter
+     * @return innermost nestedCTL.
+     */
+
     public boolean isMostNestedCTL() {
         return mostNestedCTL;
     }
+
+    /**
+     * Getter
+     * @return String representation of an Operator object.
+     */
 
     public String getOperator() {
         return operator.getOperator();
     }
 
+    /**
+     * Getter
+     * @return String representation of a Quantifier object.
+     */
+
     public String getQauntifier() {
         return qauntifier.getQuantifier();
     }
+
+    /**
+     * Getter
+     * @return FormulaElement array of size 2.
+     */
 
     public FormulaElement[] getVals() {
         return vals;
     }
 
+    /**
+     * Getter
+     * @return Array of actions for current point of execution.
+     */
+
     public String[][] getActions() {
         return actions;
     }
 
+    /**
+     * Setter
+     * @param position
+     */
+
     public void setTautology(int position) {
         vals[position] = new Tautology();
     }
+
+    /**
+     * Get a value at a specific index.
+     * @param index
+     * @return The FormulaElement object of the value at vals[index].
+     */
 
     public FormulaElement getValuesAt(int index) {
         if (vals == null || index > (vals.length - 1)) {
@@ -94,6 +131,12 @@ public class FormulaPrime extends FormulaElement {
             return vals[index];
         }
     }
+
+    /**
+     * Get String representation of actions at specific index.
+     * @param index
+     * @return String represenation of action at actions[index]
+     */
 
     public String[] getActionsAt(int index) {
         if (actions == null || index > (actions.length - 1)) {

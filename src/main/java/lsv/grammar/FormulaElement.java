@@ -1,13 +1,16 @@
 package lsv.grammar;
 
 /**
- * Created by 120011995 on 21/11/15.
+ * Abstratc superclass for the elements of an asCTL formula.
  */
 public abstract class FormulaElement {
 
     private boolean negation;
 
-
+    /**
+     * Getter
+     * @return The value of the boolean negation field.
+     */
     public boolean getNegation() {
         return negation;
     }
