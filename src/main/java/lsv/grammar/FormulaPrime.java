@@ -11,7 +11,6 @@ public class FormulaPrime extends FormulaElement {
     private Operator operator;
     private String[][] actions = new String[2][];
     private boolean mostNestedCTL = true;
-    private boolean negation;
 
     /**
      * Constructor
