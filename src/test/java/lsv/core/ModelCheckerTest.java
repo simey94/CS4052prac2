@@ -39,21 +39,41 @@ public class ModelCheckerTest {
         Formula mutualExclusionFormula = Builder.buildFormula("src/test/resources/mutualExclusionFormula.json");
         assertTrue(mc.check(mutualExclusionModel, trueConstraint, mutualExclusionFormula));
 
-        mutualExclusionFormula.setNegation(true);
+        mutualExclusionFormula.setNegation(true); //test that negation works
         assertTrue(!(mc.check(mutualExclusionModel, trueConstraint, mutualExclusionFormula)));
     }
 
 
     @Test
-    public void ourModelTest(){
-
-    Model model = Builder.buildModel("src/test/resources/ourModel.json");
-
-    Formula fairnessConstraint = Builder.buildFormula("src/test/resources/mutualExclusionFormula.json");
-
-    Formula query = Builder.buildFormula("src/test/resources/model2Formula.json");
-
-    ModelChecker mc = new SimpleModelChecker();
+    public void testConstraint() {
+        ModelChecker mc = new SimpleModelChecker();
+        Formula trueConstraint = Builder.buildFormula("src/test/resources/true.json");
+        trueConstraint.setNegation(true);
+        Model mutualExclusionModel = Builder.buildModel("src/test/resources/mutualExclusion2.json");
+        Formula mutualExclusionFormula = Builder.buildFormula("src/test/resources/mutualExclusionFormula.json");
+        assertTrue(!(mc.check(mutualExclusionModel, trueConstraint, mutualExclusionFormula)));
     }
+
+    @Test
+    public void testModel2Next() {
+        ModelChecker mc = new SimpleModelChecker();
+        Formula trueConstraint = Builder.buildFormula("src/test/resources/true.json");
+        trueConstraint.setNegation(true);
+        Model mutualExclusionModel = Builder.buildModel("src/test/resources/mutualExclusion2.json");
+        Formula mutualExclusionFormula = Builder.buildFormula("src/test/resources/mutualExclusionFormula.json");
+        assertTrue(!(mc.check(mutualExclusionModel, trueConstraint, mutualExclusionFormula)));
+    }
+
+//    @Test
+//    public void ourModelTest(){
+//
+//    Model model = Builder.buildModel("src/test/resources/ourModel.json");
+//
+//    Formula fairnessConstraint = Builder.buildFormula("src/test/resources/mutualExclusionFormula.json");
+//
+//    Formula query = Builder.buildFormula("src/test/resources/model2Formula.json");
+//
+//    ModelChecker mc = new SimpleModelChecker();
+//    }
 
 }
