@@ -15,10 +15,13 @@ class NotValidException extends Exception
     private ArrayList<State> states;
 
     public NotValidException(PointOfExecution poe) {
-        states = poe.getPreviousStates();
-        states.add(poe.getCurrentState()); // add current state on error
-        transitions = poe.getPreviousTransitions();
-
+        transitions = new ArrayList<>();
+        states = new ArrayList<>();
+        if (poe != null) {
+            states = poe.getPreviousStates();
+            states.add(poe.getCurrentState()); // add current state on error
+            transitions = poe.getPreviousTransitions();
+        }
     }
 
     public ArrayList<Transition> getTransitions() {

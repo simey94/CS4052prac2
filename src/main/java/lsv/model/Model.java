@@ -69,14 +69,17 @@ public class Model {
 
 
     public boolean equals(Model model) {
+        if (model.getStates().length != states.length) return false;
+        if (model.getTransitions().length != transitions.length) return false;
+
         for (int i=0; i<states.length; i++ ) {
             if (!(states[i].equals(model.getStates()[i]))) return false;
         }
         for (int i=0; i<transitions.length; i++ ) {
-            if (!(transitions[i].equals(model.getStates()[i]))) return false;
+            if (!(transitions[i].equals(model.getTransitions()[i]))) return false;
         }
 
-        return false;
+        return true;
 
     }
 }

@@ -6,44 +6,44 @@ import lsv.grammar.FormulaPrime;
 import lsv.model.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class SimpleModelChecker implements ModelChecker {
-
 
     private ArrayList<String> globHistory;
 
 
     public boolean check(Model model, Formula constraint, Formula formula) {
-
-
         FormulaPrime constraintPrime = new FormulaPrime(constraint);
-        boolean cont;
-        while(true) {
+        boolean cont = false;
+        while (true) {
             Model copy = new Model(model);
-        try {
-            String temp = constraintPrime.getQauntifier();
-            switch (temp.charAt(0)) {
-                case ('E'):
-                    cont = true;
+            try {
+                String temp = constraintPrime.getQauntifier();
+
+
+                if (temp != null) {
+                    switch (temp.charAt(0)) {
+                        case ('E'):
+                            cont = true;
+                            break;
+                        case ('A'):
+                            cont = false;
+                            break;
+                        default:
+                            throw new QuantifierNotFoundException(constraintPrime.getQauntifier());
+                    }
+                }
+                return checkInitStates(model, constraintPrime, cont);
+            } catch (NotValidException e) {
+                model.removeFromModel(e.getStates(), e.getTransitions());
+                if (copy.equals(model)) {
                     break;
-                case ('A'):
-                    cont = false;
-                    break;
-                default:
-                    throw new QuantifierNotFoundException(constraintPrime.getQauntifier());
+                }
+            } catch (OperatorNotSupportedException e) {
+                e.printStackTrace();
+            } catch (QuantifierNotFoundException e) {
+                e.printStackTrace();
             }
-            return checkInitStates(model, constraintPrime, cont);
-        } catch (NotValidException e) {
-            model.removeFromModel(e.getStates(), e.getTransitions());
-            if (copy.equals(model)) {
-                break;
-            }
-        } catch (OperatorNotSupportedException e) {
-            e.printStackTrace();
-        } catch (QuantifierNotFoundException e) {
-            e.printStackTrace();
-        }
         }
 
         FormulaPrime formulaPrime = new FormulaPrime(formula);
@@ -79,8 +79,6 @@ public class SimpleModelChecker implements ModelChecker {
 
         PointOfExecution next = null;
         boolean trueAtSomePoint = false;
-        ArrayList<Transition> transitions = new ArrayList<>(Arrays.asList(model.getTransitions()));
-
 
         for (State state : model.getStates()) {
             if (state.isInit()) {
@@ -115,6 +113,9 @@ public class SimpleModelChecker implements ModelChecker {
 
         boolean temp = false;
         FormulaElement[] vals = formula.getVals();
+        if (operator == null) {
+            operator = "~"; //Tilde is case if null string is passed
+        }
         switch (operator) {
 
             case ("||"):
@@ -143,13 +144,18 @@ public class SimpleModelChecker implements ModelChecker {
                         traverse(model, formula, poe, cont);
                     }
                 } else if (share(poe.getLastTransition().getActions(), (formula.getActions()[1]))) {
-//                    temp = poe.getCurrentState().isTrue(vals[1]);
-                    if  (vals[1] != null) {
+                    if (vals[1] != null) {
                         temp = poe.getCurrentState().isTrue(vals[1]);
-                    }
-                    else {
+                    } else {
                         temp = true;
                     }
+                }
+                break;
+            case ("~"): //Tilde is case if null string is passed
+                if (vals[0] != null) {
+                    temp = poe.getCurrentState().isTrue(vals[0]);
+                } else {
+                    temp = true;
                 }
                 break;
             default:
@@ -183,8 +189,12 @@ public class SimpleModelChecker implements ModelChecker {
         }
 
         char stateQuantifier = 0;
-        if (formulaPrime.getQauntifier().length() > 1)
+        String qauntifier = formulaPrime.getQauntifier();
+        if (qauntifier == null) {
+            stateQuantifier = 0;
+        } else if (qauntifier.length() > 1) {
             stateQuantifier = formulaPrime.getQauntifier().charAt(1);
+        }
         switch (stateQuantifier) {
             case ('X'):
                 Transition last = poe.getLastTransition();

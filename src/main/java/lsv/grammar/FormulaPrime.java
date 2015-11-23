@@ -19,22 +19,38 @@ public class FormulaPrime extends FormulaElement {
         //parse formula
         qauntifier = new Quantifier(f.getQuantifier());
         operator = new Operator(f.getOperator());
+        String[] ap = f.getAp();
+        String[] tauts = f.getTautology();
+        Formula[] nestedCTL = f.getNestedCTL();
 
-        if (f.getAp()[0] != null) {
-            vals[0] = new AtomicProp(f.getAp()[0]);
-        } else if (f.getTautology()[0] != null) {
-            vals[0] = new Tautology();
-        } else if (f.getNestedCTL()[0] != null) {
-            vals[0] = new FormulaPrime(f.getNestedCTL()[0]);
-            mostNestedCTL = false;
+        if (ap != null) {
+            if (ap[0] != null) {
+                vals[0] = new AtomicProp(ap[0]);
+            }
+            if (ap[1] != null) {
+                vals[1] = new AtomicProp(ap[1]);
+            }
         }
-        if (f.getAp()[1] != null) {
-            vals[1] = new AtomicProp(f.getAp()[1]);
-        } else if (f.getTautology()[1] != null) {
-            vals[1] = new Tautology();
-        } else if (f.getNestedCTL()[1] != null) {
-            vals[1] = new FormulaPrime(f.getNestedCTL()[1]);
-            mostNestedCTL = false;
+
+        if (tauts != null) {
+
+            if (tauts[0] != null) {
+                vals[0] = new Tautology();
+            }
+            if (tauts[1] != null) {
+                vals[1] = new Tautology();
+            }
+        }
+
+        if (nestedCTL != null) {
+            if (nestedCTL[0] != null) {
+                vals[0] = new FormulaPrime(nestedCTL[0]);
+                mostNestedCTL = false;
+            }
+            if (nestedCTL[1] != null) {
+                vals[1] = new FormulaPrime(nestedCTL[1]);
+                mostNestedCTL = false;
+            }
         }
         if (f.getActions() != null) {
             String[][] act = f.getActions();

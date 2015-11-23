@@ -4,9 +4,11 @@
 //    "b": ["act3", "act4"]
 //}
 
+//{
+//  "formula": "AaXa (p && q)",
+//    "a": ["act1", "act2"],
+//    "b": ["act3", "act4"]
+//}
 {
-  "formula": "AaXa (p && q)",
-    "a": ["act1", "act2"],
-    "b": ["act3", "act4"]
+  "formula": "True"
 }
-
