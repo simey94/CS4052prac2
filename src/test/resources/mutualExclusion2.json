@@ -3,7 +3,7 @@
     {
       "init": true,
       "name": "s0",
-      "label": "start"
+      "label": "s"
     },
     {
       "init": false,
@@ -13,7 +13,7 @@
     {
       "init": false,
       "name": "s2",
-      "label": "crit1"
+      "label": "c"
     },
     {
       "init": false,
@@ -23,7 +23,7 @@
     {
       "init": false,
       "name": "s4",
-      "label": "crit2"
+      "label": "d"
     },
     {
       "init": false,
@@ -33,12 +33,12 @@
     {
       "init": false,
       "name": "s6",
-      "label": "crit1,wait2"
+      "label": "c,wait2"
     },
     {
       "init": false,
       "name": "s7",
-      "label": "wait1,crit2"
+      "label": "wait1,d"
     }
   ],
   "transitions": [
@@ -46,84 +46,84 @@
       "source": "s0",
       "target": "s1",
       "actions": [
-        "wait1"
+        "act1"
       ]
     },
     {
       "source": "s1",
       "target": "s2",
       "actions": [
-        "crit1"
+        "act1"
       ]
     },
     {
       "source": "s0",
       "target": "s3",
       "actions": [
-        "wait2"
+        "act1"
       ]
     },
     {
       "source": "s1",
       "target": "s5",
       "actions": [
-        "wait1,wait2"
+        "act1"
       ]
     },
     {
       "source": "s3",
       "target": "s5",
       "actions": [
-        "wait1,wait2"
+        "act1"
       ]
     },
     {
       "source": "s3",
       "target": "s4",
       "actions": [
-        "crit2"
+        "act1"
       ]
     },
     {
       "source": "s5",
       "target": "s6",
       "actions": [
-        "crit1,wait2"
+        "act1"
       ]
     },
     {
       "source": "s5",
       "target": "s7",
       "actions": [
-        "wait1,crit2"
+        "act1"
       ]
     },
     {
       "source": "s2",
       "target": "s0",
       "actions": [
-        "crit1"
+        "act1"
       ]
     },
     {
       "source": "s4",
       "target": "s0",
       "actions": [
-        "crit2"
+        "act1"
       ]
     },
     {
       "source": "s7",
       "target": "s1",
       "actions": [
-        "wait1"
+        "act1"
       ]
     },
     {
       "source": "s6",
       "target": "s3",
       "actions": [
-        "wait2"
+        "act1"
       ]
     }
   ]
