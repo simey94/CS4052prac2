@@ -44,17 +44,6 @@ public class SimpleModelChecker implements ModelChecker {
                     }
                 }
                 checkInitStates(model, constraintPrime, cont);
-                switch (temp.charAt(0)) {
-                    case ('E'):
-                        cont = true;
-                        break;
-                    case ('A'):
-                        cont = false;
-                        break;
-                    default:
-                        throw new QuantifierNotFoundException(constraintPrime.getQauntifier());
-                }
-                return checkInitStates(model, constraintPrime, cont);
             } catch (NotValidException e) {
                 model.removeFromModel(e.getStates(), e.getTransitions());
                 if (copy.equals(model)) {
@@ -64,6 +53,9 @@ public class SimpleModelChecker implements ModelChecker {
                 e.printStackTrace();
             } catch (QuantifierNotFoundException e) {
                 e.printStackTrace();
+            }
+            if (copy.equals(model)) {
+                break;
             }
         }
 
@@ -350,7 +342,8 @@ public class SimpleModelChecker implements ModelChecker {
                         return traverse(model, formulaPrime, poe, cont);
                     } else {
                         boolean check = checkOperators(formulaPrime.getOperator(), formulaPrime, poe, model, cont);
-                        return (formulaPrime.isNegation() ^ check);
+                        check = (formulaPrime.isNegation() ^ check);
+                        return check;
                     }
             }
         }
