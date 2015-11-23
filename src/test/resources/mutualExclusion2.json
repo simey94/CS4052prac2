@@ -3,42 +3,42 @@
     {
       "init": true,
       "name": "s0",
-      "label": "s"
+      "label": ["s"]
     },
     {
       "init": false,
       "name": "s1",
-      "label": "wait1"
+      "label": ["w"]
     },
     {
       "init": false,
       "name": "s2",
-      "label": "c"
+      "label": ["c"]
     },
     {
       "init": false,
       "name": "s3",
-      "label": "wait2"
+      "label": ["y"]
     },
     {
       "init": false,
       "name": "s4",
-      "label": "d"
+      "label": ["d"]
     },
     {
       "init": false,
       "name": "s5",
-      "label": "wait1,wait2"
+      "label": ["b"]
     },
     {
       "init": false,
       "name": "s6",
-      "label": "c,wait2"
+      "label": ["a"]
     },
     {
       "init": false,
       "name": "s7",
-      "label": "wait1,d"
+      "label": ["e"]
     }
   ],
   "transitions": [
