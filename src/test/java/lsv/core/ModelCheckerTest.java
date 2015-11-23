@@ -57,12 +57,12 @@ public class ModelCheckerTest {
 
     @Test
     public void ourModelTest(){
-    Model model = Builder.buildModel("src/test/resources/ourModel.json");
-    Formula fairnessConstraint = Builder.buildFormula("src/test/resources/modelConstraint.json");
+    Model ourModel = Builder.buildModel("src/test/resources/ourModel.json");
+    Formula trueConstraint = Builder.buildFormula("src/test/resources/modelConstraint.json");
     Formula query = Builder.buildFormula("src/test/resources/modelFormula.json");
     ModelChecker mc = new SimpleModelChecker();
 
-    assertTrue(!(mc.check(model, fairnessConstraint, query)));
+    assertTrue(mc.check(ourModel, trueConstraint, query));
 
     }
 
