@@ -8,7 +8,7 @@
     {
       "init": false,
       "name": "s1",
-      "label": "wait1"
+      "label": "w"
     },
     {
       "init": false,
@@ -18,7 +18,7 @@
     {
       "init": false,
       "name": "s3",
-      "label": "wait2"
+      "label": "y"
     },
     {
       "init": false,
@@ -28,17 +28,17 @@
     {
       "init": false,
       "name": "s5",
-      "label": "wait1,wait2"
+      "label": "w,y"
     },
     {
       "init": false,
       "name": "s6",
-      "label": "c,wait2"
+      "label": "c,y"
     },
     {
       "init": false,
       "name": "s7",
-      "label": "wait1,d"
+      "label": "w,d"
     }
   ],
   "transitions": [
