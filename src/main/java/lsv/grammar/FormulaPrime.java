@@ -36,7 +36,7 @@ public class FormulaPrime extends FormulaElement {
             if (ap[1] != null) {
                 vals[1] = new AtomicProp(ap[1]);
                 if (neg != null) {
-                    vals[0].setNegation(neg[0]);
+                    vals[1].setNegation(neg[1]);
 
                 }
             }
