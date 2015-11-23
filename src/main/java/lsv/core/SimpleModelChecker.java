@@ -33,7 +33,7 @@ public class SimpleModelChecker implements ModelChecker {
                             throw new QuantifierNotFoundException(constraintPrime.getQauntifier());
                     }
                 }
-                return checkInitStates(model, constraintPrime, cont);
+                checkInitStates(model, constraintPrime, cont);
             } catch (NotValidException e) {
                 model.removeFromModel(e.getStates(), e.getTransitions());
                 if (copy.equals(model)) {
@@ -59,7 +59,8 @@ public class SimpleModelChecker implements ModelChecker {
                     throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
             }
 
-            return checkInitStates(model, formulaPrime, cont);
+            boolean test = checkInitStates(model, formulaPrime, cont);
+            return test;
         } catch (OperatorNotSupportedException e) {
             e.printStackTrace();
         } catch (QuantifierNotFoundException e) {
