@@ -139,6 +139,9 @@ public class Formula {
 
     }
 
+    public void setNegation(boolean negation) {
+        this.negation = negation;
+    }
     /**
      * Returns the parents of the FormulaAlt, if the formula is a nested formula.
      * Example:

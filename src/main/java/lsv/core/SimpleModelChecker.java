@@ -362,8 +362,7 @@ public class SimpleModelChecker implements ModelChecker {
      * @throws NotValidException
      */
     private boolean traverse(Model model, FormulaPrime formulaPrime, PointOfExecution poe, boolean cont) throws QuantifierNotFoundException, OperatorNotSupportedException, NotValidException {
-        boolean trueAtSomePoint = false;
-
+        boolean falseAtSomePoint = false; // has this ever been false?
         for (Transition t : poe.getFutureTransitions()) {
             State state = model.getStateFromName(t.getTarget());
             PointOfExecution next;
@@ -372,12 +371,12 @@ public class SimpleModelChecker implements ModelChecker {
             } catch (CycleException e) {
                 continue; // if we have reached a cycle, return false, this path canot be taken
             }
-            if (helper(model, next, formulaPrime, cont)) {
-                trueAtSomePoint = true;
+            if (!helper(model, next, formulaPrime, cont)) {
+                falseAtSomePoint = true;
             }
         }
 
-        return trueAtSomePoint;
+        return !falseAtSomePoint;
     }
 
     /**

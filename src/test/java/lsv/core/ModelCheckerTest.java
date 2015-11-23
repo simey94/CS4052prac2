@@ -16,23 +16,31 @@ public class ModelCheckerTest {
      * */
 
     @Test
-    public void buildAndCheckModel() {
+    public void checkTrue() {
 
 	Model model = Builder.buildModel("src/test/resources/model.json");
 
-	Formula fairnessConstraint = Builder.buildFormula("src/test/resources/mutualExclusionFormula.json");
-
-	Formula query = Builder.buildFormula("src/test/resources/ctl.json");
+	Formula query = Builder.buildFormula("src/test/resources/true.json");
 	
 	ModelChecker mc = new SimpleModelChecker();
+    assertTrue(mc.check(model, query, query));
 
-	// TO IMPLEMENT
-//        assertTrue(mc.check(model, fairnessConstraint, query));
 
+
+
+    }
+
+    @Test
+    public void testMutualExclusion() {
+        ModelChecker mc = new SimpleModelChecker();
+//        Test mutual Exclusion
         Formula trueConstraint = Builder.buildFormula("src/test/resources/true.json");
         Model mutualExclusionModel = Builder.buildModel("src/test/resources/mutualExclusion2.json");
         Formula mutualExclusionFormula = Builder.buildFormula("src/test/resources/mutualExclusionFormula.json");
         assertTrue(mc.check(mutualExclusionModel, trueConstraint, mutualExclusionFormula));
+
+        mutualExclusionFormula.setNegation(true);
+        assertTrue(!(mc.check(mutualExclusionModel, trueConstraint, mutualExclusionFormula)));
     }
 
 
