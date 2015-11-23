@@ -5,7 +5,7 @@ package lsv.grammar;
  */
 public abstract class FormulaElement {
 
-    private boolean negation;
+    protected boolean negation;
 
     /**
      * Getter

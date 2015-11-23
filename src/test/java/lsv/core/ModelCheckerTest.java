@@ -27,8 +27,12 @@ public class ModelCheckerTest {
 	ModelChecker mc = new SimpleModelChecker();
 
 	// TO IMPLEMENT
-        assertTrue(mc.check(model, fairnessConstraint, query));
+//        assertTrue(mc.check(model, fairnessConstraint, query));
 
+        Formula trueConstraint = Builder.buildFormula("src/test/resources/true.json");
+        Model mutualExclusionModel = Builder.buildModel("src/test/resources/mutualExclusion2.json");
+        Formula mutualExclusionFormula = Builder.buildFormula("src/test/resources/mutualExclusionFormula.json");
+        assertTrue(mc.check(mutualExclusionModel, trueConstraint, mutualExclusionFormula));
     }
 
 }
