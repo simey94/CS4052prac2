@@ -72,7 +72,7 @@ public class SimpleModelChecker implements ModelChecker {
     }
 
     public String[] getTrace() {
-        return (String[]) globHistory.toArray();
+        return globHistory.toArray(new String[globHistory.size()]);
     }
 
 
