@@ -61,15 +61,19 @@ public class SimpleModelChecker implements ModelChecker {
 
         FormulaPrime formulaPrime = new FormulaPrime(formula);
         try {
-            switch (formulaPrime.getQauntifier().charAt(0)) {
-                case ('E'):
-                    cont = true;
-                    break;
-                case ('A'):
-                    cont = false;
-                    break;
-                default:
-                    throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
+            String temp = constraintPrime.getQauntifier();
+
+            if (temp != null) {
+                switch (temp.charAt(0)) {
+                    case ('E'):
+                        cont = true;
+                        break;
+                    case ('A'):
+                        cont = false;
+                        break;
+                    default:
+                        throw new QuantifierNotFoundException(formulaPrime.getQauntifier());
+                }
             }
 
             boolean test = checkInitStates(model, formulaPrime, cont);
@@ -398,6 +402,8 @@ public class SimpleModelChecker implements ModelChecker {
         }
         return false;
     }
+
+
 }
 
 

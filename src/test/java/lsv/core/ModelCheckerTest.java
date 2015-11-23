@@ -43,4 +43,7 @@ public class ModelCheckerTest {
         assertTrue(!(mc.check(mutualExclusionModel, trueConstraint, mutualExclusionFormula)));
     }
 
+
+//    @Test
+//    public void test
 }
