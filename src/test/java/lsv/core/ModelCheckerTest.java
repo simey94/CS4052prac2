@@ -21,12 +21,9 @@ public class ModelCheckerTest {
 	Model model = Builder.buildModel("src/test/resources/model.json");
 
 	Formula query = Builder.buildFormula("src/test/resources/true.json");
-	
+
 	ModelChecker mc = new SimpleModelChecker();
     assertTrue(mc.check(model, query, query));
-
-
-
 
     }
 
@@ -53,7 +50,6 @@ public class ModelCheckerTest {
         Formula mutualExclusionFormula = Builder.buildFormula("src/test/resources/mutualExclusionFormula.json");
         assertTrue(!(mc.check(mutualExclusionModel, trueConstraint, mutualExclusionFormula)));
     }
-
 
     @Test
     public void ourModelTest(){
