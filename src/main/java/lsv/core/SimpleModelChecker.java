@@ -21,9 +21,6 @@ public class SimpleModelChecker implements ModelChecker {
     public boolean check(Model model, Formula constraint, Formula formula) {
         FormulaPrime constraintPrime = new FormulaPrime(constraint);
         boolean cont = false;
-
-        FormulaPrime constraintPrime = new FormulaPrime(constraint);
-        boolean cont;
         while (true) {
             Model copy = new Model(model);
             try {
@@ -113,7 +110,6 @@ public class SimpleModelChecker implements ModelChecker {
 
         PointOfExecution next = null;
         boolean trueAtSomePoint = false;
-        ArrayList<Transition> transitions = new ArrayList<>(Arrays.asList(model.getTransitions()));
 
         for (State state : model.getStates()) {
             if (state.isInit()) {
